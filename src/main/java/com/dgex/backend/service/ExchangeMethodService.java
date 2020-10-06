@@ -22,4 +22,20 @@ public class ExchangeMethodService {
         method.setUpdateDatetime(new Date());
         exchangeMethodRepository.save(method);
     }
+
+    @Transactional
+    public void insert(String exchangeMethod) {
+        ExchangeMethod method = exchangeMethodRepository.findByDeleteDatetimeIsNull();
+
+        if(method == null){
+            ExchangeMethod exchangeMethod1 = new ExchangeMethod();
+            exchangeMethod1.setName(exchangeMethod);
+            exchangeMethod1.setCreateDatetime(new Date());
+            exchangeMethodRepository.save(exchangeMethod1);
+        }else {
+            method.setName(exchangeMethod);
+            method.setUpdateDatetime(new Date());
+            exchangeMethodRepository.save(method);
+        }
+    }
 }

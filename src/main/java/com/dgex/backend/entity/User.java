@@ -31,7 +31,6 @@ public class User {
     private String emailId;
 
     //비밀번호
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column
     private String password;
 
@@ -54,6 +53,10 @@ public class User {
     //권한
     @Column
     private String level;
+
+    //메뉴권한
+    @Column
+    private String menuLevel;
 
     //상태(0:미인증 1:비활성화 2:활성화 3:탈퇴)
     @Column

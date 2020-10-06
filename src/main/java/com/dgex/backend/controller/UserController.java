@@ -34,6 +34,22 @@ public class UserController {
         }
     }
 
+    @ApiOperation(value = "관리자 등록", notes = "입력한 회원 정보를 등록한다.")
+    @PostMapping(value = "/insertAdmin")
+    public CommonResult insertAdmin(
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "emailId", required = false) String emailId,
+            @RequestParam(value = "password", required = false) String password,
+            @RequestParam(value = "menuLevel", required = false) String menuLevel
+    ) {
+        Map<String, Object> result = userService.insertAdmin(name, emailId, password, menuLevel);
+        if(result.get("code")=="0001"){
+            return responseService.getSuccessResult();
+        }else{
+            return responseService.getFailResult(0000, result.get("msg").toString());
+        }
+    }
+
     @ApiOperation(value = "회원 리스트", notes = "회원 pk (userId)를 역방향(최신순)으로 정렬한 리스트를 조회한다.")
     @GetMapping(value = "/getList")
     public SingleResult<Object> getList(
@@ -42,6 +58,14 @@ public class UserController {
                                         @RequestParam(defaultValue = "1", required = false) Integer page
     ) {
         return responseService.getSingleResult(userService.getList(page, searchKey, searchWord));
+    }
+
+    @ApiOperation(value = "관리자 리스트", notes = "회원 pk (userId)를 역방향(최신순)으로 정렬한 리스트를 조회한다.")
+    @GetMapping(value = "/getManageList")
+    public SingleResult<Object> getManageList(
+            @RequestParam(defaultValue = "1", required = false) Integer page
+    ) {
+        return responseService.getSingleResult(userService.getManageList(page));
     }
 
     @ApiOperation(value = "회원 수정", notes = "회원 정보를 수정한다.")
@@ -54,12 +78,34 @@ public class UserController {
         return responseService.getSuccessResult();
     }
 
+    @ApiOperation(value = "관리자 수정", notes = "회원 정보를 수정한다.")
+    @PostMapping(value = "/updateAdmin")
+    public CommonResult updateAdmin(
+            @RequestParam(value = "userId", required = false) Integer userId,
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "emailId", required = false) String emailId,
+            @RequestParam(value = "updatePassword", required = false) String password
+
+    ) {
+        userService.updateAdmin(userId, name, emailId, password);
+        return responseService.getSuccessResult();
+    }
+
     @ApiOperation(value = "회원 단건 조회", notes = "회원 pk (userId)를 받아 해당 회원의 정보를 조회한다.")
     @GetMapping(value = "/getOne")
     public SingleResult<Object> getOne(
             @RequestParam(value = "userId", required = false) Integer userId
     ) {
         return responseService.getSingleResult(userService.findByUserInfo(userId));
+    }
+
+    @ApiOperation(value = "회원 비밀번호 체크", notes = "회원 pk (userId)를 받아 해당 회원의 정보를 조회한다.")
+    @GetMapping(value = "/findPassword")
+    public SingleResult<Object> passwordCheck(
+            @RequestParam(value = "userId", required = false) Integer userId,
+            @RequestParam(value = "pw", required = false) String password
+    ) {
+        return responseService.getSingleResult(userService.passwordCheck(userId, password));
     }
 
     @ApiOperation(value = "로그인", notes = "회원 로그인 정보를 받아 일치 여부를 조회한다.")

@@ -21,17 +21,29 @@ public class ExchangeMethodController {
     private final ExchangeMethodRepository exchangeMethodRepository;
     private final ExchangeMethodService exchangeMethodService;
 
-    @ApiOperation(value = "교환비율 리스트")
+    @ApiOperation(value = "교환관리 리스트")
     @GetMapping(value = "/getList")
     public SingleResult<Object> getList(
     ) {
         return responseService.getSingleResult(exchangeMethodRepository.findByDeleteDatetimeIsNull());
     }
 
-    @ApiOperation(value = "공지사항 수정", notes = "공지사항 정보를 수정한다.")
+    @ApiOperation(value = "교환관리 수정", notes = "교환관리 정보를 수정한다.")
     @PostMapping(value = "/update")
     public CommonResult update(ExchangeMethod exchangeMethod) {
         exchangeMethodService.update(exchangeMethod);
         return responseService.getSuccessResult();
     }
+
+    @ApiOperation(value = "교환관리 등록", notes = "입력한 교환비율 정보를 등록한다.")
+    @PostMapping(value = "/insert")
+    public CommonResult insert(
+            @RequestParam(value = "exchangeMethod", required = false) String exchangeMethod
+    ) {
+        exchangeMethodService.insert(exchangeMethod);
+        return responseService.getSuccessResult();
+    }
+
+
+
 }

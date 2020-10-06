@@ -33,6 +33,6 @@ public class ExchangeRateController {
     @GetMapping(value = "/getList")
     public SingleResult<Object> getList(
     ) {
-        return responseService.getSingleResult(exchangeRateRepository.findByDeleteDatetimeIsNull());
+        return responseService.getSingleResult(exchangeRateService.getList());
     }
 }

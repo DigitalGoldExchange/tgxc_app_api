@@ -49,6 +49,33 @@ public class UserService {
     }
 
     @Transactional
+    public Map<String,Object> insertAdmin(String name,String emailId,String password,String menuLevel) {
+        Map<String,Object> result = new HashMap<>();
+        if(name=="" || emailId=="" || password=="" || menuLevel==""){
+            result.put("code", "0000");
+            result.put("msg", "필수값 누락으로 회원가입 실패");
+            return result;
+        }else if(userRepository.findByDeleteDatetimeIsNullAndEmailId(emailId)!=null){
+            result.put("code", "0000");
+            result.put("msg", "이미 가입된 이메일입니다");
+            return result;
+        }else{
+            BCryptPasswordEncoder pe = new BCryptPasswordEncoder();
+            User user = new User();
+            user.setName(name);
+            user.setEmailId(emailId);
+            user.setCreateDatetime(new Date());
+            user.setPassword(pe.encode(password));
+            user.setLevel("MANAGE");
+            user.setMenuLevel(menuLevel);
+            user.setTotalTg(0.0);
+            userRepository.save(user);
+            result.put("code","0001");
+            return result;
+        }
+    }
+
+    @Transactional
     public Object getList(Integer page, Integer searchKey,  String searchWord) {
         Map<String, Object> result = new HashMap<>();
         List<User> list;
@@ -78,6 +105,24 @@ public class UserService {
             list = pageList.toList();
             totalPages = pageList.getTotalPages();
         }
+        result.put("list",list);
+        result.put("totalPages",totalPages);
+
+        return result;
+    }
+
+    @Transactional
+    public Object getManageList(Integer page) {
+        Map<String, Object> result = new HashMap<>();
+        List<User> list;
+        Integer totalPages;
+
+        Sort sort = Sort.by(Sort.Direction.DESC,"createDatetime");
+
+        Page<User> pageList = userRepository.findByDeleteDatetimeIsNullAndLevel("MANAGE",PageRequest.of(page-1, 10, sort));
+        list = pageList.toList();
+        totalPages = pageList.getTotalPages();
+
         result.put("list",list);
         result.put("totalPages",totalPages);
 
@@ -120,6 +165,47 @@ public class UserService {
             }else{
                 result.put("result", false);
             }
+        }
+
+        return result;
+    }
+
+    @Transactional
+    public Object passwordCheck(Integer userId, String password) {
+        Map<String, Object> result = new HashMap<>();
+        User user = userRepository.findById(userId).get();
+
+        if(user == null){
+            result.put("result", false);
+        }else{
+            BCryptPasswordEncoder pe = new BCryptPasswordEncoder();
+            if(pe.matches(password, user.getPassword())){
+                result.put("result", true);
+                result.put("user", user);
+            }else{
+                result.put("result", false);
+            }
+        }
+
+        return result;
+    }
+
+    @Transactional
+    public Object updateAdmin(Integer userId, String name, String emailId, String password) {
+        Map<String, Object> result = new HashMap<>();
+        User user = userRepository.findById(userId).get();
+
+        if(user == null){
+            result.put("result", false);
+        }else{
+            BCryptPasswordEncoder pe = new BCryptPasswordEncoder();
+
+            user.setName(name);
+            user.setEmailId(emailId);
+            user.setPassword(pe.encode(password));
+            user.setUpdateDatetime(new Date());
+            userRepository.save(user);
+            result.put("result", true);
         }
 
         return result;
