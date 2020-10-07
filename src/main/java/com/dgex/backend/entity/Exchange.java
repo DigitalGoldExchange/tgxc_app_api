@@ -38,6 +38,10 @@ public class Exchange {
     @Column
     private String status;
 
+    //반려사유
+    @Column
+    private String note;
+
     //등록일
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
     @Column

@@ -74,14 +74,20 @@ public class NoticeService {
 
     @Transactional
     public void update(Integer noticeId, String status, String koreanYn) {
-       if("Y".equals(koreanYn)){
+       if("Y".equals(koreanYn) || koreanYn == null){
            NoticeKr noticeKr = noticeKrRepository.findById(noticeId).get();
            noticeKr.setDispYn(status);
+           if("D".equals(status)){
+               noticeKr.setDeleteDatetime(new Date());
+           }
            noticeKr.setUpdateDatetime(new Date());
            noticeKrRepository.save(noticeKr);
        }else{
            NoticeEng noticeEng = noticeEngRepository.findById(noticeId).get();
            noticeEng.setDispYn(status);
+           if("D".equals(status)){
+               noticeEng.setDeleteDatetime(new Date());
+           }
            noticeEng.setUpdateDatetime(new Date());
            noticeEngRepository.save(noticeEng);
        }

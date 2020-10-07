@@ -101,7 +101,7 @@ public class UserService {
             list = pageList.toList();
             totalPages = pageList.getTotalPages();
         }else{
-            Page<User> pageList = userRepository.findByDeleteDatetimeIsNull(PageRequest.of(page-1, 10, sort));
+            Page<User> pageList = userRepository.findByDeleteDatetimeIsNullAndLevel("USER", PageRequest.of(page-1, 10, sort));
             list = pageList.toList();
             totalPages = pageList.getTotalPages();
         }
@@ -133,6 +133,9 @@ public class UserService {
     public void update(Integer userId, Integer status) {
         User user = userRepository.findById(userId).get();
         user.setStatus(status);
+        if(status == 3){
+            user.setDeleteDatetime(new Date());
+        }
         user.setUpdateDatetime(new Date());
         userRepository.save(user);
     }
