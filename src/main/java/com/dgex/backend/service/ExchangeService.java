@@ -19,9 +19,6 @@ public class ExchangeService {
 
     @Transactional
     public Object getList(Integer page, Integer searchKey,  String searchWord) {
-        System.out.println("page:"+page);
-        System.out.println("searchKey:"+searchKey);
-        System.out.println("searchWord:"+searchWord);
         Map<String, Object> result = new HashMap<>();
         List<Exchange> list;
         Integer totalPages;

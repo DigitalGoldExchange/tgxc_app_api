@@ -91,6 +91,16 @@ public class UserController {
         return responseService.getSuccessResult();
     }
 
+    @ApiOperation(value = "관리자 권한수정", notes = "회원 정보를 수정한다.")
+    @PostMapping(value = "/updateLevel")
+    public CommonResult updateLevel(
+            @RequestParam(value = "level", required = false) String level
+
+    ) {
+        userService.updateLevel(level);
+        return responseService.getSuccessResult();
+    }
+
     @ApiOperation(value = "회원 단건 조회", notes = "회원 pk (userId)를 받아 해당 회원의 정보를 조회한다.")
     @GetMapping(value = "/getOne")
     public SingleResult<Object> getOne(

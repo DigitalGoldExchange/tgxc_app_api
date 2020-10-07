@@ -214,5 +214,22 @@ public class UserService {
         return result;
     }
 
+    @Transactional
+    public Object updateLevel(String level) {
+        Map<String, Object> result = new HashMap<>();
+
+        String[] levelArray = level.split(";");
+        for(int i = 0; i < levelArray.length; i++){
+            String[] userLevel = levelArray[i].split("\\|");
+            User user = userRepository.findById(Integer.parseInt(userLevel[0])).get();
+            user.setMenuLevel(userLevel[1]);
+            userRepository.save(user);
+            result.put("result", true);
+        }
+//        User user = userRepository.findById(userId).get();
+
+        return result;
+    }
+
 
 }
