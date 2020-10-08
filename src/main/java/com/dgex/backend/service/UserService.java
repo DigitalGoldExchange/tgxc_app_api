@@ -222,7 +222,11 @@ public class UserService {
         for(int i = 0; i < levelArray.length; i++){
             String[] userLevel = levelArray[i].split("\\|");
             User user = userRepository.findById(Integer.parseInt(userLevel[0])).get();
-            user.setMenuLevel(userLevel[1]);
+            if(userLevel.length > 1){
+                user.setMenuLevel(userLevel[1]);
+            }else{
+                user.setMenuLevel("");
+            }
             userRepository.save(user);
             result.put("result", true);
         }
