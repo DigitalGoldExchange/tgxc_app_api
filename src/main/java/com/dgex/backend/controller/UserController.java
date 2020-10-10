@@ -127,6 +127,15 @@ public class UserController {
         return responseService.getSingleResult(userService.loginCheck(emailId, password));
     }
 
+    @ApiOperation(value = "회원 삭제", notes = "입력한 회원 정보를 삭제한다.")
+    @PostMapping(value = "/delete")
+    public CommonResult delete(
+            @RequestParam(value = "userId", required = false) Integer userId
+    ) {
+        userService.delete(userId);
+        return responseService.getSuccessResult();
+    }
+
 
 
 }

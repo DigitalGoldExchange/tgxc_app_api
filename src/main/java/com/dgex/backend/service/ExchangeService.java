@@ -58,8 +58,13 @@ public class ExchangeService {
     }
 
     @Transactional
-    public void update(Integer exchangeId, String status) {
+    public void update(Integer exchangeId, String status, String note) {
         Exchange exchange = exchangeRepository.findById(exchangeId).get();
+        if(note != null){
+            exchange.setNote(note);
+        }else{
+            exchange.setNote("");
+        }
         exchange.setStatus(status);
         exchange.setUpdateDatetime(new Date());
         exchangeRepository.save(exchange);

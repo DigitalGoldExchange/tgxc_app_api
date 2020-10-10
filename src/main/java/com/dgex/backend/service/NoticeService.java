@@ -1,10 +1,12 @@
 package com.dgex.backend.service;
 
+import com.dgex.backend.entity.Notice;
 import com.dgex.backend.entity.NoticeEng;
 import com.dgex.backend.entity.NoticeKr;
 import com.dgex.backend.entity.User;
 import com.dgex.backend.repository.NoticeEngRepository;
 import com.dgex.backend.repository.NoticeKrRepository;
+import com.dgex.backend.repository.NoticeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,49 +25,45 @@ public class NoticeService {
 
     private final NoticeKrRepository noticeKrRepository;
     private final NoticeEngRepository noticeEngRepository;
+    private final NoticeRepository noticeRepository;
 
     @Transactional
     public void insert(String title, String contents, String koreanYn){
-
-        if("Y".equals(koreanYn)){
-            NoticeKr noticeKr = new NoticeKr();
-            noticeKr.setTitle(title);
-            noticeKr.setContents(contents);
-            noticeKr.setCreateDatetime(new Date());
-            noticeKr.setDispYn("N");
-            noticeKrRepository.save(noticeKr);
+        Notice notice = new Notice();
+        notice.setTitle(title);
+        notice.setContents(contents);
+        notice.setCreateDatetime(new Date());
+        notice.setDispYn("N");
+        if("Y".equals(koreanYn) || koreanYn == null){
+            notice.setType("KO");
         }else{
-            NoticeEng noticeEng = new NoticeEng();
-            noticeEng.setContents(contents);
-            noticeEng.setTitle(title);
-            noticeEng.setCreateDatetime(new Date());
-            noticeEng.setDispYn("N");
-            noticeEngRepository.save(noticeEng);
+            notice.setType("EN");
         }
+
+        noticeRepository.save(notice);
 
     }
 
     @Transactional
     public Object getList(Integer page, String searchWord, String koreanYn) {
         Map<String, Object> result = new HashMap<>();
-        List<NoticeKr> krList;
-        List<NoticeEng> engList;
+        List<Notice> list;
         Integer totalPages;
 
         Sort sort = Sort.by(Sort.Direction.DESC,"createDatetime");
 
         if("Y".equals(koreanYn)|| koreanYn == null){
-            Page<NoticeKr> pageList = noticeKrRepository.findByDeleteDatetimeIsNull(PageRequest.of(page-1, 10, sort));
-            krList = pageList.toList();
+            Page<Notice> pageList = noticeRepository.findByTitleAndTypeAndDeleteDatetimeIsNull("%"+searchWord+"%", "KO",PageRequest.of(page-1, 10, sort));
+            list = pageList.toList();
             totalPages = pageList.getTotalPages();
-            result.put("list",krList);
+            result.put("list",list);
             result.put("totalPages",totalPages);
 
         }else{
-            Page<NoticeEng> pageList = noticeEngRepository.findByDeleteDatetimeIsNull(PageRequest.of(page-1, 10, sort));
-            engList = pageList.toList();
+            Page<Notice> pageList = noticeRepository.findByTitleAndTypeAndDeleteDatetimeIsNull("%"+searchWord+"%" ,"EN", PageRequest.of(page-1, 10, sort));
+            list = pageList.toList();
             totalPages = pageList.getTotalPages();
-            result.put("list",engList);
+            result.put("list",list);
             result.put("totalPages",totalPages);
         }
 
@@ -74,23 +72,29 @@ public class NoticeService {
 
     @Transactional
     public void update(Integer noticeId, String status, String koreanYn) {
-       if("Y".equals(koreanYn) || koreanYn == null){
-           NoticeKr noticeKr = noticeKrRepository.findById(noticeId).get();
-           noticeKr.setDispYn(status);
-           if("D".equals(status)){
-               noticeKr.setDeleteDatetime(new Date());
-           }
-           noticeKr.setUpdateDatetime(new Date());
-           noticeKrRepository.save(noticeKr);
-       }else{
-           NoticeEng noticeEng = noticeEngRepository.findById(noticeId).get();
-           noticeEng.setDispYn(status);
-           if("D".equals(status)){
-               noticeEng.setDeleteDatetime(new Date());
-           }
-           noticeEng.setUpdateDatetime(new Date());
-           noticeEngRepository.save(noticeEng);
-       }
+        Notice notice = noticeRepository.findById(noticeId).get();
+        notice.setDispYn(status);
+        if("D".equals(status)){
+            notice.setDeleteDatetime(new Date());
+        }
+        notice.setUpdateDatetime(new Date());
+        noticeRepository.save(notice);
+
+    }
+
+    @Transactional
+    public void updateContent(Integer noticeId, String title, String contents, String koreanYn) {
+        Notice notice = noticeRepository.findById(noticeId).get();
+        notice.setTitle(title);
+        notice.setContents(contents);
+        if("Y".equals(koreanYn)){
+            notice.setType("KO");
+        }else{
+            notice.setType("EN");
+        }
+        notice.setUpdateDatetime(new Date());
+        noticeRepository.save(notice);
+
     }
 
     @Transactional

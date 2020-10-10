@@ -33,9 +33,10 @@ public class ExchangeController {
     @PostMapping(value = "/update")
     public CommonResult update(
             @RequestParam(value = "exchangeId", required = false) Integer exchangeId,
-            @RequestParam(value = "status", required = false) String status
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "note", required = false) String note
     ) {
-        exchangeService.update(exchangeId, status);
+        exchangeService.update(exchangeId, status, note);
         return responseService.getSuccessResult();
     }
 

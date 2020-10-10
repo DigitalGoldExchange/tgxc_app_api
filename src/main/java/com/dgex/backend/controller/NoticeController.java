@@ -1,6 +1,7 @@
 package com.dgex.backend.controller;
 
 import com.dgex.backend.entity.User;
+import com.dgex.backend.repository.NoticeRepository;
 import com.dgex.backend.response.CommonResult;
 import com.dgex.backend.response.SingleResult;
 import com.dgex.backend.service.NoticeService;
@@ -20,6 +21,7 @@ public class NoticeController {
 
     private final NoticeService noticeService;
     private final ResponseService responseService;
+    private final NoticeRepository noticeRepository;
 
     @ApiOperation(value = "공지사항 등록", notes = "입력한 공지사항 정보를 등록한다.")
     @PostMapping(value = "/insert")
@@ -60,6 +62,26 @@ public class NoticeController {
             @RequestParam(value = "koreanYn", required = false) String koreanYn
     ) {
         noticeService.delete(noticeId, koreanYn);
+        return responseService.getSuccessResult();
+    }
+
+    @ApiOperation(value = "공지사항 단건 조회", notes = "공지사항 pk (noticeId)를 받아 해당 회원의 정보를 조회한다.")
+    @GetMapping(value = "/getOne")
+    public SingleResult<Object> getOne(
+            @RequestParam(value = "noticeId", required = false) Integer noticeId
+    ) {
+        return responseService.getSingleResult(noticeRepository.findById(noticeId));
+    }
+
+    @ApiOperation(value = "공지사항 내용수정", notes = "공지사항 pk (noticeId)를 받아 해당 회원의 정보를 조회한다.")
+    @PostMapping(value = "/updateContent")
+    public CommonResult updateContent(
+            @RequestParam(value = "noticeId", required = false) Integer noticeId,
+            @RequestParam(value = "title", required = false) String title,
+            @RequestParam(value = "contents", required = false) String contents,
+            @RequestParam(value = "koreanYn", required = false) String koreanYn
+    ) {
+        noticeService.updateContent(noticeId, title, contents, koreanYn);
         return responseService.getSuccessResult();
     }
 

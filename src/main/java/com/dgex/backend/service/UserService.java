@@ -141,6 +141,13 @@ public class UserService {
     }
 
     @Transactional
+    public void delete(Integer userId) {
+        User user = userRepository.findById(userId).get();
+        user.setDeleteDatetime(new Date());
+        userRepository.save(user);
+    }
+
+    @Transactional
     public Object findByUserInfo(Integer userId) {
         User user = userRepository.findById(userId).get();
         List<Exchange> exchangeList = exchangeRepository.findByDeleteDatetimeIsNullAndUser(user);
