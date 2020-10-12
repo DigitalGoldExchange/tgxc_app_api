@@ -25,4 +25,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query("select us FROM User us where us.level = 'USER' and us.deleteDatetime is null and us.phoneNumber like :searchWord")
     Page<User> findByPhoneNumberAndDeleteDatetimeIsNull(@Param("searchWord") String searchWord, Pageable pageable);
+
+    User findByDeleteDatetimeIsNullAndNameAndEmailId(String name, String emailId);
 }

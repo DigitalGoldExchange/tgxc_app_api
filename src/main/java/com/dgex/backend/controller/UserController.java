@@ -91,6 +91,17 @@ public class UserController {
         return responseService.getSuccessResult();
     }
 
+    @ApiOperation(value = "비밀번호 초기화", notes = "회원 정보를 수정한다.")
+    @PostMapping(value = "/resetPassword")
+    public CommonResult resetPassword(
+            @RequestParam(value = "userId", required = false) Integer userId,
+            @RequestParam(value = "password", required = false) String password
+
+    ) {
+        userService.resetPassword(userId, password);
+        return responseService.getSuccessResult();
+    }
+
     @ApiOperation(value = "관리자 권한수정", notes = "회원 정보를 수정한다.")
     @PostMapping(value = "/updateLevel")
     public CommonResult updateLevel(
@@ -135,6 +146,17 @@ public class UserController {
         userService.delete(userId);
         return responseService.getSuccessResult();
     }
+
+    @ApiOperation(value = "비밀번호 찾기")
+    @PostMapping(value = "/sendEmail")
+    public SingleResult<Object> sendEmail(
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "emailId", required = false) String emailId
+    ) {
+        return responseService.getSingleResult(userService.sendEmail(name, emailId));
+    }
+
+
 
 
 

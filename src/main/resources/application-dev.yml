@@ -23,3 +23,20 @@ spring:
 
   logging:
     config: classpath:logback.xml
+
+  mail:
+    host: smtp.gmail.com
+    port: 465
+    username: laidback_tony@laidback.co.kr
+    password: 'csw60559310!'
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          start-tls-enable: true
+          auth: true
+          ssl:
+            enable: true
+        transport:
+          protocol: smtps
+    default-encoding: UTF-8
