@@ -10,6 +10,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -154,6 +155,14 @@ public class UserController {
             @RequestParam(value = "emailId", required = false) String emailId
     ) {
         return responseService.getSingleResult(userService.sendEmail(name, emailId));
+    }
+
+    @ApiOperation(value = "회원 단건 조회", notes = "회원 pk (userId)를 받아 해당 회원의 정보를 조회한다.")
+    @GetMapping(value = "/findByEmailId")
+    public SingleResult<Object> findByEmailId(
+            @RequestParam(value = "emailId", required = false) String emailId
+    ) {
+        return responseService.getSingleResult(userService.findByEmailId(emailId));
     }
 
 

@@ -40,3 +40,5 @@ spring:
         transport:
           protocol: smtps
     default-encoding: UTF-8
+
+upload.dir: ./uploads

@@ -5,6 +5,7 @@ import com.dgex.backend.entity.Exchange;
 import com.dgex.backend.entity.User;
 import com.dgex.backend.repository.ExchangeRepository;
 import com.dgex.backend.repository.UserRepository;
+import com.dgex.backend.service.common.FileManageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,6 +17,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -31,6 +33,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final ExchangeRepository exchangeRepository;
+    private final FileManageService fileManageService;
 
     @Autowired
     private JavaMailSender mailSender;
@@ -47,7 +50,7 @@ public class UserService {
     @Transactional
     public Map<String,Object> insert(User user) {
         Map<String,Object> result = new HashMap<>();
-        if(user.getEmailId()=="" || user.getPassword()=="" || user.getName()=="" || user.getPhoneNumber()==""){
+        if(user.getEmailId()=="" || user.getPassword()=="" /*|| user.getName()=="" || user.getPhoneNumber()=="" */){
             result.put("code", "0000");
             result.put("msg", "필수값 누락으로 회원가입 실패");
             return result;
@@ -58,9 +61,19 @@ public class UserService {
         }else{
             BCryptPasswordEncoder pe = new BCryptPasswordEncoder();
 
+            if(user.getProfileImage() != null){
+                user.setProfileImagePath(fileManageService.storeFile(user.getProfileImage()));
+            }
+
+            user.setEmailId(user.getEmailId());
+            user.setAddress(user.getAddress());
+            user.setAddressDetail(user.getAddressDetail());
+            user.setZipCode(user.getZipCode());
+            user.setName(user.getName());
+            user.setPhoneNumber(user.getPhoneNumber());
             user.setCreateDatetime(new Date());
             user.setPassword(pe.encode(user.getPassword()));
-            user.setLevel("MANAGE");
+            user.setLevel("USER");
             user.setTotalTg(0.0);
             userRepository.save(user);
             result.put("code","0001");
@@ -170,6 +183,19 @@ public class UserService {
     @Transactional
     public Object findByUserInfo(Integer userId) {
         User user = userRepository.findById(userId).get();
+        List<Exchange> exchangeList = exchangeRepository.findByDeleteDatetimeIsNullAndUser(user);
+
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("exchangeList", exchangeList);
+        result.put("user",user);
+
+        return result;
+    }
+
+    @Transactional
+    public Object findByEmailId(String emailId) {
+        User user = userRepository.findByDeleteDatetimeIsNullAndEmailId(emailId);
         List<Exchange> exchangeList = exchangeRepository.findByDeleteDatetimeIsNullAndUser(user);
 
         Map<String, Object> result = new HashMap<>();
