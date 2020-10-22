@@ -26,13 +26,14 @@ public class UserController {
 
     @ApiOperation(value = "회원 등록", notes = "입력한 회원 정보를 등록한다.")
     @PostMapping(value = "/insert")
-    public CommonResult insert(User user) {
-        Map<String, Object> result = userService.insert(user);
-        if(result.get("code")=="0001"){
-            return responseService.getSuccessResult();
-        }else{
-            return responseService.getFailResult(0000, result.get("msg").toString());
-        }
+    public SingleResult<Object> insert(User user,@RequestParam(value = "profileImage", required = false) MultipartFile profileImage) {
+//        Map<String, Object> result = userService.insert(user, profileImage);
+//        if(result.get("code")=="0001"){
+//            return responseService.getSuccessResult();
+//        }else{
+//            return responseService.getFailResult(0000, result.get("msg").toString());
+//        }
+        return responseService.getSingleResult(userService.insert(user, profileImage));
     }
 
     @ApiOperation(value = "관리자 등록", notes = "입력한 회원 정보를 등록한다.")

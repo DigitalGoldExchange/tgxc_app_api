@@ -3,7 +3,9 @@ package com.dgex.backend.service;
 import ch.qos.logback.core.encoder.EchoEncoder;
 import com.dgex.backend.entity.Exchange;
 import com.dgex.backend.entity.User;
+import com.dgex.backend.entity.UserPassportImage;
 import com.dgex.backend.repository.ExchangeRepository;
+import com.dgex.backend.repository.UserPassportImageRepository;
 import com.dgex.backend.repository.UserRepository;
 import com.dgex.backend.service.common.FileManageService;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +36,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final ExchangeRepository exchangeRepository;
     private final FileManageService fileManageService;
+    private final UserPassportImageRepository userPassportImageRepository;
 
     @Autowired
     private JavaMailSender mailSender;
@@ -48,7 +51,7 @@ public class UserService {
     }
 
     @Transactional
-    public Map<String,Object> insert(User user) {
+    public Map<String,Object> insert(User user, MultipartFile profileImage) {
         Map<String,Object> result = new HashMap<>();
         if(user.getEmailId()=="" || user.getPassword()=="" /*|| user.getName()=="" || user.getPhoneNumber()=="" */){
             result.put("code", "0000");
@@ -61,10 +64,6 @@ public class UserService {
         }else{
             BCryptPasswordEncoder pe = new BCryptPasswordEncoder();
 
-            if(user.getProfileImage() != null){
-                user.setProfileImagePath(fileManageService.storeFile(user.getProfileImage()));
-            }
-
             user.setEmailId(user.getEmailId());
             user.setAddress(user.getAddress());
             user.setAddressDetail(user.getAddressDetail());
@@ -75,7 +74,16 @@ public class UserService {
             user.setPassword(pe.encode(user.getPassword()));
             user.setLevel("USER");
             user.setTotalTg(0.0);
-            userRepository.save(user);
+            User newUser = userRepository.save(user);
+
+            if(profileImage != null){
+                UserPassportImage up = new UserPassportImage();
+                up.setProfileImagePath(fileManageService.storeFile(profileImage));
+                up.setCreateDatetime(new Date());
+                up.setUser(newUser);
+                userPassportImageRepository.save(up);
+            }
+            result.put("user", newUser);
             result.put("code","0001");
             return result;
         }
