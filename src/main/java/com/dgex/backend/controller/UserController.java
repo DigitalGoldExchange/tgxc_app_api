@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
 @Api(tags = {"User : 회원(User)"})
@@ -166,6 +168,20 @@ public class UserController {
         return responseService.getSingleResult(userService.findByEmailId(emailId));
     }
 
+    @ApiOperation(value = "OTP코드")
+    @GetMapping(value = "/getOtpCode")
+    public SingleResult<Object> getOtpCode() {
+        return responseService.getSingleResult(userService.getOtpCode());
+    }
+
+    @ApiOperation(value = "OTP 인증")
+    @PostMapping(value = "/checkCode")
+    public SingleResult<Object> checkCode(
+            @RequestParam(value = "userCode", required = true) String userCode,
+            @RequestParam(value = "otpKey", required = true) String otpKey
+    ) throws NoSuchAlgorithmException, InvalidKeyException {
+        return responseService.getSingleResult(userService.checkCode(userCode, otpKey));
+    }
 
 
 

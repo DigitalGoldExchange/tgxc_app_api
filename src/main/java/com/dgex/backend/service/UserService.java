@@ -9,6 +9,7 @@ import com.dgex.backend.repository.UserPassportImageRepository;
 import com.dgex.backend.repository.UserRepository;
 import com.dgex.backend.service.common.FileManageService;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.codec.binary.Base32;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,13 +22,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +51,8 @@ public class UserService {
         for (int i = 0; i < len; i++) sb.append(AB.charAt(rnd.nextInt(AB.length())));
         return sb.toString();
     }
+
+
 
     @Transactional
     public Map<String,Object> insert(User user, MultipartFile profileImage) {
@@ -354,6 +358,75 @@ public class UserService {
         }
 
         return result;
+    }
+
+
+    @Transactional
+    public Object getOtpCode() {
+        Map<String, Object> result = new HashMap<>();
+
+        byte[] buffer = new byte[5 + 5 * 5];
+        new Random().nextBytes(buffer);
+        Base32 codec = new Base32();
+        byte[] secretKey = Arrays.copyOf(buffer, 10);
+        byte[] bEncodeKey = codec.encode(secretKey);
+
+        String encodedKey = new String(bEncodeKey);
+        result.put("encodedKey", encodedKey);
+
+        return result;
+    }
+
+    @Transactional
+    public Object checkCode(String userCode, String otpKey) throws NoSuchAlgorithmException, InvalidKeyException {
+
+        long otpNum = Integer.parseInt(userCode);
+        long wave = new Date().getTime()/30000;
+
+        Base32 codec = new Base32();
+        byte[] decodedKey = codec.decode(otpKey);
+        int window = 3;
+//        boolean result = false;
+        //사용자와 서버의 시간 차이가 발생할 수 있어 플러스 마이너스 1분 30초 여유를 둔다.
+//        for(int i = -window; i <= window; i++){
+//            long hash = verify_code(decodedKey, wave + i);
+            long hash = verify_code(decodedKey, wave );
+            if(hash == otpNum){
+//                result = true;
+                return true;
+            }
+//        }
+
+        return false;
+    }
+
+    private static int verify_code(byte[] key, long t) throws NoSuchAlgorithmException, InvalidKeyException{
+        byte[] data = new byte[8];
+        long value = t;
+        for (int i = 8; i-- > 0; value >>>= 8) {
+            data[i] = (byte) value;
+        }
+
+        SecretKeySpec signKey = new SecretKeySpec(key, "HmacSHA1");
+        Mac mac = Mac.getInstance("HmacSHA1");
+        mac.init(signKey);
+        byte[] hash = mac.doFinal(data);
+
+        int offset = hash[20 - 1] & 0xF;
+
+        // We're using a long because Java hasn't got unsigned int.
+        long truncatedHash = 0;
+        for (int i = 0; i < 4; ++i) {
+            truncatedHash <<= 8;
+            // We are dealing with signed bytes:
+            // we just keep the first byte.
+            truncatedHash |= (hash[offset + i] & 0xFF);
+        }
+
+        truncatedHash &= 0x7FFFFFFF;
+        truncatedHash %= 1000000;
+
+        return (int) truncatedHash;
     }
 
 
