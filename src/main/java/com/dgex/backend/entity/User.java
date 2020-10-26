@@ -75,6 +75,14 @@ public class User {
     @Column
     private String signKey;
 
+    //디바이스 토큰
+    @Column
+    private String deviceToken;
+
+    //디바이스 종류
+    @Column
+    private String deviceType;
+
     @Column
     private Double totalTg;
 

@@ -126,6 +126,7 @@ public class UserService {
             user.setLevel("USER");
             user.setTotalTg(0.0);
             user.setStatus(0);
+            user.setDeviceToken(user.getDeviceToken());
             user.setSignKey(newPw);
             User newUser = userRepository.save(user);
 
