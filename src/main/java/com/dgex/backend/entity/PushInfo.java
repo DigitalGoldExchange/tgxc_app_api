@@ -37,8 +37,8 @@ public class PushInfo {
 
     //전송여부
     @Column
-    @ApiModelProperty(value = "전송여부", required = true)
-    private String sendYn;
+    @ApiModelProperty(value = "읽음 여부", required = true)
+    private String readYn;
 
     //등록일
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")

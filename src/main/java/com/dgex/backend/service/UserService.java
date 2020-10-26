@@ -61,7 +61,7 @@ public class UserService {
             msg.setSubject("회원가입 이메일 인증 메일입니다.");
             msg.setText(new StringBuffer().append("<h1>[이메일 인증]</h1>")
                     .append("<p>아래 링크를 클릭하시면 이메일 인증이 완료됩니다.</p>")
-                    .append("<a href='http://localhost:8093/user/signUpConfirm?email=")
+                    .append("<a href='http://117.52.98.39:8093/user/signUpConfirm?email=")
                     .append(emailId)
                     .append("&authKey=")
                     .append(signKey)
@@ -88,7 +88,11 @@ public class UserService {
         User user = userRepository.findByDeleteDatetimeIsNullAndEmailIdAndSignKey(emailId, signKey);
 
         if(user != null){
-            user.setStatus(1);
+            if(user.getKoreanYn().equals("Y")){
+                user.setStatus(2);
+            }else{
+                user.setStatus(1);
+            }
             user.setUpdateDatetime(new Date());
             userRepository.save(user);
             return true;
@@ -281,17 +285,25 @@ public class UserService {
     }
 
     @Transactional
-    public Object loginCheck(String emailId, String password) {
+    public Object loginCheck(String emailId, String password, String deviceToken, String deviceType) {
         Map<String, Object> result = new HashMap<>();
         User user = userRepository.findByDeleteDatetimeIsNullAndEmailId(emailId);
 
         if(user == null){
             result.put("result", false);
         }else{
+            user.setDeviceToken(deviceToken);
+            user.setDeviceType(deviceType);
+            user.setUpdateDatetime(new Date());
+            userRepository.save(user);
+
+            List<Exchange> exchangeList = exchangeRepository.findByDeleteDatetimeIsNullAndUser(user);
+
             BCryptPasswordEncoder pe = new BCryptPasswordEncoder();
             if(pe.matches(password, user.getPassword())){
                 result.put("result", true);
                 result.put("user", user);
+                result.put("exchangeList", exchangeList);
             }else{
                 result.put("result", false);
             }

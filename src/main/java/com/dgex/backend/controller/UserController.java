@@ -159,9 +159,11 @@ public class UserController {
     @PostMapping(value = "/login")
     public SingleResult<Object> login(
             @RequestParam(value = "emailId", required = false) String emailId,
-            @RequestParam(value = "password", required = false) String password
+            @RequestParam(value = "password", required = false) String password,
+            @RequestParam(value = "deviceToken", required = false) String deviceToken,
+            @RequestParam(value = "deviceType", required = false) String deviceType
     ) {
-        return responseService.getSingleResult(userService.loginCheck(emailId, password));
+        return responseService.getSingleResult(userService.loginCheck(emailId, password, deviceToken, deviceType));
     }
 
     @ApiOperation(value = "회원 삭제", notes = "입력한 회원 정보를 삭제한다.")

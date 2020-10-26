@@ -1,6 +1,8 @@
 package com.dgex.backend.service;
 
+import com.dgex.backend.entity.PushInfo;
 import com.dgex.backend.entity.User;
+import com.dgex.backend.repository.PushInfoRepository;
 import com.dgex.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpResponse;
@@ -19,6 +21,7 @@ import java.util.*;
 public class PushInfoService {
 
     private final UserRepository userRepository;
+    private final PushInfoRepository pushInfoRepository;
 
     @Transactional
     public Map<String,Object> sendPush(Integer userId, String title, String content) {
@@ -51,17 +54,17 @@ public class PushInfoService {
                 post.setEntity(new StringEntity(message.toString(), "UTF-8"));
                 response = client.execute(post);
 
-                System.out.println(response);
-
+                PushInfo pushInfo = new PushInfo();
+                pushInfo.setContents(content);
+                pushInfo.setTitle(title);
+                pushInfo.setUser(user);
+                pushInfo.setReadYn("N");
+                pushInfo.setCreateDatetime(new Date());
+                pushInfoRepository.save(pushInfo);
 
             }catch (Exception e){
                 e.printStackTrace();
             }
-
-
-
-
-
 
         }else{
             result.put("msg", "푸시 전송 실패");
