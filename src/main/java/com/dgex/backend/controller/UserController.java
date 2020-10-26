@@ -12,6 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
@@ -36,6 +39,25 @@ public class UserController {
 //            return responseService.getFailResult(0000, result.get("msg").toString());
 //        }
         return responseService.getSingleResult(userService.insert(user, profileImage));
+    }
+
+    @ApiOperation(value = "이메일 인증")
+    @GetMapping(value = "/signUpConfirm")
+    public void signUpConfirm(
+            @RequestParam(value = "email", required = false) String emailId,
+            @RequestParam(value = "authKey", required = false) String signKey,
+            HttpServletResponse response
+    ) throws IOException {
+//        return responseService.getSingleResult(userService.signUpConfirm(emailId, signKey));
+        boolean result = userService.signUpConfirm(emailId, signKey);
+        response.setContentType("text/html; charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        if(result){
+            out.println("<script>alert('인증되었습니다.'); window.open('','_self').close();</script>");
+        }else{
+            out.println("<script>alert('인증 실패했습니다..'); window.open('','_self').close();</script>");
+        }
+
     }
 
     @ApiOperation(value = "관리자 등록", notes = "입력한 회원 정보를 등록한다.")

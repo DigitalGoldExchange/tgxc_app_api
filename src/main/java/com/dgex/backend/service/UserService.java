@@ -26,6 +26,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletResponse;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -52,7 +53,52 @@ public class UserService {
         return sb.toString();
     }
 
+    @Async
+    public boolean sendSignKey(String emailId, String signKey){
 
+        MimeMessage msg = mailSender.createMimeMessage();
+        try{
+            msg.setSubject("회원가입 이메일 인증 메일입니다.");
+            msg.setText(new StringBuffer().append("<h1>[이메일 인증]</h1>")
+                    .append("<p>아래 링크를 클릭하시면 이메일 인증이 완료됩니다.</p>")
+                    .append("<a href='http://localhost:8093/user/signUpConfirm?email=")
+                    .append(emailId)
+                    .append("&authKey=")
+                    .append(signKey)
+                    .append("'>이메일 인증 확인</a>")
+                    .toString(),"utf-8","html");
+            msg.setRecipients(MimeMessage.RecipientType.TO, emailId);
+        }catch (MessagingException e){
+            return false;
+        }
+        try{
+            mailSender.send(msg);
+            return true;
+        }catch (MailException e){
+            e.printStackTrace();
+            return false;
+        }
+
+    }
+
+    @Transactional
+    public boolean signUpConfirm(String emailId, String signKey){
+        Map<String, Object> result = new HashMap<>();
+
+        User user = userRepository.findByDeleteDatetimeIsNullAndEmailIdAndSignKey(emailId, signKey);
+
+        if(user != null){
+            user.setStatus(1);
+            user.setUpdateDatetime(new Date());
+            userRepository.save(user);
+            return true;
+        }else{
+            result.put("msg","회원 정보를 찾을 수 없습니다.");
+            result.put("result",false);
+            return false;
+        }
+
+    }
 
     @Transactional
     public Map<String,Object> insert(User user, MultipartFile profileImage) {
@@ -67,6 +113,7 @@ public class UserService {
             return result;
         }else{
             BCryptPasswordEncoder pe = new BCryptPasswordEncoder();
+            String newPw = randomString(8);
 
             user.setEmailId(user.getEmailId());
             user.setAddress(user.getAddress());
@@ -78,6 +125,8 @@ public class UserService {
             user.setPassword(pe.encode(user.getPassword()));
             user.setLevel("USER");
             user.setTotalTg(0.0);
+            user.setStatus(0);
+            user.setSignKey(newPw);
             User newUser = userRepository.save(user);
 
             if(profileImage != null){
@@ -87,8 +136,20 @@ public class UserService {
                 up.setUser(newUser);
                 userPassportImageRepository.save(up);
             }
-            result.put("user", newUser);
-            result.put("code","0001");
+
+            boolean resultSendSignKey = sendSignKey(user.getEmailId(), newPw);
+
+            if(resultSendSignKey){
+                result.put("user", newUser);
+                result.put("code","0001");
+            }else{
+                user.setDeleteDatetime(new Date());
+                userRepository.save(user);
+                result.put("code", "0000");
+                result.put("msg", "이메일 인증 메인 전송에 실패했습니다.");
+            }
+
+
             return result;
         }
     }

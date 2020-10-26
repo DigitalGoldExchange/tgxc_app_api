@@ -71,6 +71,10 @@ public class User {
     @Column
     private Integer status;
 
+    //인증키
+    @Column
+    private String signKey;
+
     @Column
     private Double totalTg;
 

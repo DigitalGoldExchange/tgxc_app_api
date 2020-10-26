@@ -11,6 +11,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     User findByDeleteDatetimeIsNullAndEmailId(String emailId);
 
+    User findByDeleteDatetimeIsNullAndEmailIdAndSignKey(String emailId, String signKey);
+
     Page<User> findByDeleteDatetimeIsNull(Pageable pageable);
 
     Page<User> findByDeleteDatetimeIsNullAndLevel(String level, Pageable pageable);
