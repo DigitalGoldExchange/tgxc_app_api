@@ -303,7 +303,12 @@ public class UserService {
             if(pe.matches(password, user.getPassword())){
                 result.put("result", true);
                 result.put("user", user);
-                result.put("exchangeList", exchangeList);
+                if(exchangeList != null){
+                    result.put("exchangeList", exchangeList);
+                }else{
+                    result.put("exchangeList", false);
+                }
+
             }else{
                 result.put("result", false);
             }
