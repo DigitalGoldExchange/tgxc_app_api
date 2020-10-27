@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -45,6 +46,7 @@ public class UserService {
     private JavaMailSender mailSender;
 
     static final String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    static final String CD = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     static SecureRandom rnd = new SecureRandom();
 
     String randomString(int len) {
@@ -53,8 +55,23 @@ public class UserService {
         return sb.toString();
     }
 
+    String randomString1(int len) {
+        StringBuilder sb = new StringBuilder(len);
+        for (int i = 0; i < len; i++) sb.append(CD.charAt(rnd.nextInt(CD.length())));
+        return sb.toString();
+    }
+
+    String randomIdentifyNumber(String key){
+        StringBuilder sb = new StringBuilder(16);
+        for(int i = 0; i < 16; i++){
+            sb.append(key.charAt(rnd.nextInt(16)));
+        }
+        return sb.toString();
+    }
+
     @Async
-    public boolean sendSignKey(String emailId, String signKey){
+    public Object sendSignKey(String emailId, String signKey){
+        Map<String, Object> result = new HashMap<>();
 
         MimeMessage msg = mailSender.createMimeMessage();
         try{
@@ -69,15 +86,16 @@ public class UserService {
                     .toString(),"utf-8","html");
             msg.setRecipients(MimeMessage.RecipientType.TO, emailId);
         }catch (MessagingException e){
-            return false;
+            result.put("result",false);
         }
         try{
             mailSender.send(msg);
-            return true;
+            result.put("result",true);
         }catch (MailException e){
             e.printStackTrace();
-            return false;
+            result.put("result",false);
         }
+        return result;
 
     }
 
@@ -119,6 +137,14 @@ public class UserService {
             BCryptPasswordEncoder pe = new BCryptPasswordEncoder();
             String newPw = randomString(8);
 
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMddHHmmss");
+
+            Date time = new Date();
+            String timeString = dateFormat.format(time);
+
+            String key = timeString + randomString1(4);
+
+            user.setIdentifyNumber(randomIdentifyNumber(key));
             user.setEmailId(user.getEmailId());
             user.setAddress(user.getAddress());
             user.setAddressDetail(user.getAddressDetail());
@@ -142,23 +168,13 @@ public class UserService {
                 userPassportImageRepository.save(up);
             }
 
-            boolean resultSendSignKey = sendSignKey(user.getEmailId(), newPw);
-
-            if(resultSendSignKey){
-                result.put("user", newUser);
-                result.put("code","0001");
-            }else{
-                user.setDeleteDatetime(new Date());
-                userRepository.save(user);
-                result.put("code", "0000");
-                result.put("msg", "이메일 인증 메인 전송에 실패했습니다.");
-            }
-
+            result.put("user", newUser);
+            result.put("code","0001");
 
             return result;
         }
     }
-
+//16개 영문숫자 섞어서
     @Transactional
     public Map<String,Object> insertAdmin(String name,String emailId,String password,String menuLevel) {
         Map<String,Object> result = new HashMap<>();

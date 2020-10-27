@@ -75,6 +75,10 @@ public class User {
     @Column
     private String signKey;
 
+    //인증키
+    @Column
+    private String identifyNumber;
+
     //디바이스 토큰
     @Column
     private String deviceToken;

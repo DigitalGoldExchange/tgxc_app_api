@@ -207,6 +207,15 @@ public class UserController {
         return responseService.getSingleResult(userService.checkCode(userCode, otpKey));
     }
 
+    @ApiOperation(value = "confirmEmail")
+    @PostMapping(value = "/sendSignKey")
+    public SingleResult<Object> sendSignKey(
+            @RequestParam(value = "emailId", required = true) String emailId,
+            @RequestParam(value = "signKey", required = true) String signKey
+    ) {
+        return responseService.getSingleResult(userService.sendSignKey(emailId, signKey));
+    }
+
 
 
 
