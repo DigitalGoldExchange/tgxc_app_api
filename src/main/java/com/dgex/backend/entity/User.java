@@ -77,6 +77,10 @@ public class User {
 
     //인증키
     @Column
+    private String otpKey;
+
+    //인증키
+    @Column
     private String identifyNumber;
 
     //디바이스 토큰

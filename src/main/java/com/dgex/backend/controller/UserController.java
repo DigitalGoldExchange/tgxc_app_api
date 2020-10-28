@@ -208,6 +208,17 @@ public class UserController {
         return responseService.getSingleResult(userService.checkCode(userCode, otpKey));
     }
 
+    @ApiOperation(value = "OTP 인증")
+    @PostMapping(value = "/confirmOtp")
+    public SingleResult<Object> confirmOtp(
+            @RequestParam(value = "userCode", required = true) String userCode,
+            @RequestParam(value = "userId", required = true) Integer userId
+    ) throws NoSuchAlgorithmException, InvalidKeyException {
+        return responseService.getSingleResult(userService.confirmOtp(userCode, userId));
+    }
+
+
+
     @ApiOperation(value = "confirmEmail")
     @PostMapping(value = "/sendSignKey")
     public SingleResult<Object> sendSignKey(
@@ -218,6 +229,15 @@ public class UserController {
     }
 
 
+    @ApiOperation(value = "OTP 수정")
+    @PostMapping(value = "/updateOtpKey")
+    public CommonResult updateOtpKey(
+            @RequestParam(value = "userId", required = false) Integer userId,
+            @RequestParam(value = "otpKey", required = false) String otpKey
+    ) {
+        userService.updateOtpKey(userId, otpKey);
+        return responseService.getSuccessResult();
+    }
 
 
 }

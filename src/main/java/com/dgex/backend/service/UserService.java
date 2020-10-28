@@ -530,5 +530,42 @@ public class UserService {
         return (int) truncatedHash;
     }
 
+    @Transactional
+    public void updateOtpKey(Integer userId, String otpKey) {
+        User user = userRepository.findById(userId).get();
+        user.setOtpKey(otpKey);
+        user.setUpdateDatetime(new Date());
+        userRepository.save(user);
+    }
+
+
+
+    @Transactional
+    public Object confirmOtp(String userCode, Integer userId) throws NoSuchAlgorithmException, InvalidKeyException {
+
+        User user = userRepository.findById(userId).get();
+
+        long otpNum = Integer.parseInt(userCode);
+        long wave = new Date().getTime()/30000;
+
+        Base32 codec = new Base32();
+        byte[] decodedKey = codec.decode(user.getOtpKey());
+        int window = 3;
+//        boolean result = false;
+        //사용자와 서버의 시간 차이가 발생할 수 있어 플러스 마이너스 1분 30초 여유를 둔다.
+//        for(int i = -window; i <= window; i++){
+//            long hash = verify_code(decodedKey, wave + i);
+        long hash = verify_code(decodedKey, wave );
+        if(hash == otpNum){
+//                result = true;
+            return true;
+        }
+//        }
+
+        return false;
+    }
+
+
+
 
 }
