@@ -189,6 +189,7 @@ public class UserController {
     public SingleResult<Object> findByEmailId(
             @RequestParam(value = "emailId", required = false) String emailId
     ) {
+        System.out.println(emailId+"________________");
         return responseService.getSingleResult(userService.findByEmailId(emailId));
     }
 

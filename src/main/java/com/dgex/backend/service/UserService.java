@@ -290,12 +290,18 @@ public class UserService {
     @Transactional
     public Object findByEmailId(String emailId) {
         User user = userRepository.findByDeleteDatetimeIsNullAndEmailId(emailId);
-        List<Exchange> exchangeList = exchangeRepository.findByDeleteDatetimeIsNullAndUser(user);
+//        List<Exchange> exchangeList = exchangeRepository.findByDeleteDatetimeIsNullAndUser(user);
 
         Map<String, Object> result = new HashMap<>();
 
-        result.put("exchangeList", exchangeList);
-        result.put("user",user);
+//        result.put("exchangeList", exchangeList);
+        if(user == null){
+            result.put("result", false);
+        }else{
+            result.put("result", true);
+            result.put("user",user);
+        }
+
 
         return result;
     }
