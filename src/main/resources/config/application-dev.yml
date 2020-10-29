@@ -19,13 +19,14 @@ spring:
     hibernate:
       ddl-auto: update
   banner:
-    location: banner.txt
+    location: ../banner.txt
 
   logging:
     config: classpath:logback.xml
 
   jwt:
     secret: govlepel@$&amp;
+
 
   mail:
     host: smtp.gmail.com

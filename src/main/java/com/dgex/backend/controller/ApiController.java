@@ -7,6 +7,8 @@ import com.dgex.backend.service.ExchangeService;
 import com.dgex.backend.service.ResponseService;
 import com.dgex.backend.service.UserService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +26,9 @@ public class ApiController {
     private final ResponseService responseService;
 
 
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "access_token", required = true, dataType = "String", paramType = "header")
+    })
     @ApiOperation(value = "회원고유번호확인")
     @GetMapping(value = "/userInfo")
     public SingleResult<Object> userInfo(

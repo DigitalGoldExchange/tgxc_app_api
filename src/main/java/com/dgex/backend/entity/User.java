@@ -1,13 +1,19 @@
 package com.dgex.backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 
 //회원
 @Builder
@@ -113,4 +119,49 @@ public class User {
     private Date updateDatetime;
 
 
+//    @JsonIgnore
+//    @ApiModelProperty(hidden = true)
+//    @Override
+//    public Collection<? extends GrantedAuthority> getAuthorities() {
+//        Collection<GrantedAuthority> authorities = new HashSet<>(1);
+//        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+//
+//        return authorities;
+//    }
+//
+//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+//    @Override
+//    public String getPassword() {
+//        return this.password;
+//    }
+//
+//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+//    @Override
+//    public String getUsername() {
+//        return this.name;
+//    }
+//
+//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+//    @Override
+//    public boolean isAccountNonExpired() {
+//        return true;
+//    }
+//
+//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+//    @Override
+//    public boolean isAccountNonLocked() {
+//        return true;
+//    }
+//
+//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+//    @Override
+//    public boolean isCredentialsNonExpired() {
+//        return true;
+//    }
+//
+//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+//    @Override
+//    public boolean isEnabled() {
+//        return true;
+//    }
 }

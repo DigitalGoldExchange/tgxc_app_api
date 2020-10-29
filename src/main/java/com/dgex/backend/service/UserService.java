@@ -340,6 +340,7 @@ public class UserService {
             if(pe.matches(password, user.getPassword())){
                 result.put("result", true);
                 result.put("user", user);
+//                result.put("token", jwtTokenProvider.createToken(String.valueOf(user.getUserId()),null));
                 if(exchangeList != null){
                     result.put("exchangeList", exchangeList);
                 }else{
@@ -350,7 +351,8 @@ public class UserService {
                 result.put("result", false);
             }
         }
-
+//        eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNjAzOTQ5MTUwLCJleHAiOjE2MDM5NDkxNjB9.ecxMUlTu-3Hh1cZG4sX_ONcCQ4V4jA5oortHtRWQtW8
+//        eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0IiwiaWF0IjoxNjAzOTQ5ODc4LCJleHAiOjE2MDQwMzYyNzh9.kz43uVgKa0abUBEEzkFaKmDGvH_vaC9cSEV3JebCb9k
         return result;
     }
 
