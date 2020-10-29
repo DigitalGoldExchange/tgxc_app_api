@@ -26,15 +26,14 @@ public class ApiController {
     private final ResponseService responseService;
 
 
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "access_token", required = true, dataType = "String", paramType = "header")
-    })
+
     @ApiOperation(value = "회원고유번호확인")
     @GetMapping(value = "/userInfo")
     public SingleResult<Object> userInfo(
-            @RequestParam(value = "userId") String identifyNumber
+            @RequestParam(value = "userId") String identifyNumber,
+            @RequestHeader(value = "token") String token
     ) {
-        return responseService.getSingleResult(userService.userInfo(identifyNumber));
+        return responseService.getSingleResult(userService.userInfo(identifyNumber,token));
     }
 
     @ApiOperation(value = "장부등록")

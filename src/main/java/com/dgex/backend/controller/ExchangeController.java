@@ -9,6 +9,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Api(tags = {"Exchange : 거래내역(Exchange)"})
 @RequiredArgsConstructor
@@ -52,6 +53,32 @@ public class ExchangeController {
     @PostMapping(value = "/insert")
     public CommonResult insert(Exchange exchange) throws Exception {
         exchangeService.insert(exchange);
+        return responseService.getSuccessResult();
+    }
+
+    @ApiOperation(value = "교환 등록")
+    @PostMapping(value = "/insertWithdraw")
+    public CommonResult insertWithdraw(
+            @RequestParam(value = "userId", required = false) Integer userId,
+            @RequestParam(value = "walletAddr", required = false) String walletAddr,
+            @RequestParam(value = "sendTg", required = false) Double sendTg
+    ) {
+        exchangeService.insertWithdraw(userId, walletAddr, sendTg);
+        return responseService.getSuccessResult();
+    }
+
+    @ApiOperation(value = "교환 등록")
+    @PostMapping(value = "/insertExchange")
+    public CommonResult insertExchange(
+            @RequestParam(value = "userId") Integer userId,
+            @RequestParam(value = "walletAddr") String walletAddr,
+            @RequestParam(value = "exchangeMethod") String exchangeMethod,
+            @RequestParam(value = "reqAmount") Double reqAmount,
+            @RequestParam(value = "identifyCard") MultipartFile identifyCard,
+            @RequestParam(value = "profileImage") MultipartFile profileImage
+
+    ) {
+        exchangeService.insertExchange(userId, walletAddr,exchangeMethod, reqAmount, identifyCard, profileImage );
         return responseService.getSuccessResult();
     }
 }

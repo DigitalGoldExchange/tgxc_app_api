@@ -1,6 +1,7 @@
 package com.dgex.backend.service;
 
 import ch.qos.logback.core.encoder.EchoEncoder;
+import com.dgex.backend.config.JwtTokenProvider;
 import com.dgex.backend.entity.Exchange;
 import com.dgex.backend.entity.User;
 import com.dgex.backend.entity.UserPassportImage;
@@ -8,6 +9,7 @@ import com.dgex.backend.repository.ExchangeRepository;
 import com.dgex.backend.repository.UserPassportImageRepository;
 import com.dgex.backend.repository.UserRepository;
 import com.dgex.backend.service.common.FileManageService;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.binary.Base32;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.SignatureException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -41,6 +46,7 @@ public class UserService {
     private final ExchangeRepository exchangeRepository;
     private final FileManageService fileManageService;
     private final UserPassportImageRepository userPassportImageRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
     private JavaMailSender mailSender;
@@ -268,6 +274,27 @@ public class UserService {
     }
 
     @Transactional
+    public void updateUser(Integer userId,String address,String addressDetail,String phoneNumber, String password) {
+        User user = userRepository.findById(userId).get();
+        if(address != null){
+            user.setAddress(address);
+        }
+        if(addressDetail != null){
+            user.setAddressDetail(addressDetail);
+        }
+        if(phoneNumber != null){
+            user.setPhoneNumber(phoneNumber);
+        }
+        if(password != null) {
+            BCryptPasswordEncoder pe = new BCryptPasswordEncoder();
+            user.setPassword(pe.encode(password));
+        }
+
+        user.setUpdateDatetime(new Date());
+        userRepository.save(user);
+    }
+
+    @Transactional
     public void delete(Integer userId) {
         User user = userRepository.findById(userId).get();
         user.setDeleteDatetime(new Date());
@@ -288,19 +315,27 @@ public class UserService {
     }
 
     @Transactional
-    public Object userInfo(String identifyNumber) {
+    public Object userInfo(String identifyNumber, String token) {
         User user = userRepository.findByDeleteDatetimeIsNullAndIdentifyNumber(identifyNumber);
-
         Map<String, Object> result = new HashMap<>();
-
-        if(user != null){
-            result.put("result", true);
+        if (token != null && jwtTokenProvider.validateToken(token)) {
+//            Authentication auth = jwtTokenProvider.getAuthentication(token);
+//            SecurityContextHolder.getContext().setAuthentication(auth);
+            if(user != null){
+                result.put("result", true);
+            }else{
+                result.put("result", false);
+            }
         }else{
             result.put("result", false);
+            result.put("msg", "토큰이 유효하지 않습니다.");
         }
+
 
         return result;
     }
+
+
 
     @Transactional
     public Object findByEmailId(String emailId) {
@@ -340,7 +375,7 @@ public class UserService {
             if(pe.matches(password, user.getPassword())){
                 result.put("result", true);
                 result.put("user", user);
-//                result.put("token", jwtTokenProvider.createToken(String.valueOf(user.getUserId()),null));
+                result.put("token", jwtTokenProvider.createToken(String.valueOf(user.getUserId())));
                 if(exchangeList != null){
                     result.put("exchangeList", exchangeList);
                 }else{
@@ -351,8 +386,7 @@ public class UserService {
                 result.put("result", false);
             }
         }
-//        eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNjAzOTQ5MTUwLCJleHAiOjE2MDM5NDkxNjB9.ecxMUlTu-3Hh1cZG4sX_ONcCQ4V4jA5oortHtRWQtW8
-//        eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0IiwiaWF0IjoxNjAzOTQ5ODc4LCJleHAiOjE2MDQwMzYyNzh9.kz43uVgKa0abUBEEzkFaKmDGvH_vaC9cSEV3JebCb9k
+
         return result;
     }
 

@@ -1,65 +1,41 @@
 package com.dgex.backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 import java.util.Date;
 
-//교환
 @Builder
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "exchange")
-public class Exchange {
-
+@Table(name = "user_exchange_image")
+public class UserExchangeImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
-    private Integer exchangeId;
+    private Integer userExchangeId;
 
     //회원
     @ManyToOne
     @JoinColumn(name = "userId")
     private User user;
 
-    //신청번호
-    @Column
-    private String reqNumber;
-
-    //신청수량
-    @Column
-    private Double amount;
-
-    //진행상황
-    @Column
-    private String status;
-
-    //반려사유
-    @Column
-    private String note;
-
-    //거래타입
-    @Column
-    private String tradeType;
-
-    //txId
-    @Column
-    private String txId;
-
-    //txId time
-    @Column
-    private String txIdDatetime;
-
-    //walletAddr
-    @Column
-    private String walletAddr;
+    //회원
+    @ManyToOne
+    @JoinColumn(name = "exchangeId")
+    private Exchange exchange;
 
     @Column
-    private String exchangeMethod;
+    private String profileImagePath;
+
+    @Column
+    private String identifyCardPath;
 
     //등록일
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
@@ -67,19 +43,23 @@ public class Exchange {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createDatetime;
 
-    //수정일
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
-    @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updateDatetime;
-
     //삭제일
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
     @Column
     @Temporal(TemporalType.TIMESTAMP)
     private Date deleteDatetime;
 
+    //수정일
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
+    @Column
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updateDatetime;
 
+    @Transient
+    @ApiModelProperty(value = "이미지")
+    private MultipartFile profileImage;
 
-
+    @Transient
+    @ApiModelProperty(value = "신분증")
+    private MultipartFile identifyCard;
 }

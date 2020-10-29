@@ -2,14 +2,18 @@ package com.dgex.backend.service;
 
 import com.dgex.backend.entity.Exchange;
 import com.dgex.backend.entity.User;
+import com.dgex.backend.entity.UserExchangeImage;
 import com.dgex.backend.repository.ExchangeRepository;
+import com.dgex.backend.repository.UserExchangeImageRepository;
 import com.dgex.backend.repository.UserRepository;
+import com.dgex.backend.service.common.FileManageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -19,6 +23,8 @@ public class ExchangeService {
 
     private final ExchangeRepository exchangeRepository;
     private final UserRepository userRepository;
+    private final FileManageService fileManageService;
+    private final UserExchangeImageRepository userExchangeImageRepository;
 
     @Transactional
     public Object getList(Integer page, Integer searchKey,  String searchWord) {
@@ -93,6 +99,51 @@ public class ExchangeService {
         exchange.setStatus("신청");
         exchangeRepository.save(exchange);
     }
+
+    @Transactional
+    public void insertWithdraw(Integer userId, String walletAddr, Double sendTg) {
+
+        User user = userRepository.findById(userId).get();
+        user.setTotalTg(user.getTotalTg() - sendTg);
+        userRepository.save(user);
+
+        Exchange exchange = new Exchange();
+        exchange.setCreateDatetime(new Date());
+        exchange.setTradeType("OUT");
+        exchange.setWalletAddr(walletAddr);
+        exchange.setAmount(sendTg);
+        exchange.setStatus("신청");
+        exchange.setUser(user);
+        exchangeRepository.save(exchange);
+    }
+
+    @Transactional
+    public void insertExchange(Integer userId, String exchangeMethod, String walletAddr, Double reqAmount, MultipartFile identifyCard,MultipartFile profileImage) {
+
+        User user = userRepository.findById(userId).get();
+
+        Exchange exchange = new Exchange();
+        exchange.setCreateDatetime(new Date());
+        exchange.setTradeType("EXCHANGE");
+        exchange.setWalletAddr(walletAddr);
+        exchange.setAmount(reqAmount);
+        exchange.setStatus("신청");
+        exchange.setUser(user);
+        exchange.setExchangeMethod(exchangeMethod);
+        Exchange newEx = exchangeRepository.save(exchange);
+
+        if(profileImage != null && identifyCard != null){
+            UserExchangeImage userExchangeImage = new UserExchangeImage();
+            userExchangeImage.setProfileImagePath(fileManageService.storeFile(profileImage));
+            userExchangeImage.setIdentifyCardPath(fileManageService.storeFile(identifyCard));
+            userExchangeImage.setCreateDatetime(new Date());
+            userExchangeImage.setUser(user);
+            userExchangeImage.setExchange(newEx);
+            userExchangeImageRepository.save(userExchangeImage);
+        }
+    }
+
+
 
     @Transactional
     public Map<String,Object> insertBook(String identifyNumber, String txId,Double amount,String txidTime ){

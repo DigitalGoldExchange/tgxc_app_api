@@ -192,7 +192,6 @@ public class UserController {
     public SingleResult<Object> findByEmailId(
             @RequestParam(value = "emailId", required = false) String emailId
     ) {
-        System.out.println(emailId+"________________");
         return responseService.getSingleResult(userService.findByEmailId(emailId));
     }
 
@@ -239,6 +238,19 @@ public class UserController {
             @RequestParam(value = "otpKey", required = false) String otpKey
     ) {
         userService.updateOtpKey(userId, otpKey);
+        return responseService.getSuccessResult();
+    }
+
+    @ApiOperation(value = "개인정보 수정")
+    @PostMapping(value = "/updateUser")
+    public CommonResult updateUser(
+            @RequestParam(value = "userId", required = false) Integer userId,
+            @RequestParam(value = "address", required = false) String address,
+            @RequestParam(value = "addressDetail", required = false) String addressDetail,
+            @RequestParam(value = "phoneNumber", required = false) String phoneNumber,
+            @RequestParam(value = "password", required = false) String password
+    ) {
+        userService.updateUser(userId, address, addressDetail, phoneNumber, password);
         return responseService.getSuccessResult();
     }
 
