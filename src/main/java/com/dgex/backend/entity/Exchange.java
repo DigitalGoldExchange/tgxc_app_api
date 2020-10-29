@@ -32,7 +32,7 @@ public class Exchange {
 
     //신청수량
     @Column
-    private String reqAmount;
+    private Double amount;
 
     //진행상황
     @Column
@@ -41,6 +41,18 @@ public class Exchange {
     //반려사유
     @Column
     private String note;
+
+    //거래타입
+    @Column
+    private String tradeType;
+
+    //txId
+    @Column
+    private String txId;
+
+    //txId time
+    @Column
+    private String txIdDatetime;
 
     //등록일
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")

@@ -29,4 +29,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     Page<User> findByPhoneNumberAndDeleteDatetimeIsNull(@Param("searchWord") String searchWord, Pageable pageable);
 
     User findByDeleteDatetimeIsNullAndNameAndEmailId(String name, String emailId);
+
+    User findByDeleteDatetimeIsNullAndIdentifyNumber(String identifyNumber);
 }

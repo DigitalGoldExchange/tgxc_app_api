@@ -1,7 +1,9 @@
 package com.dgex.backend.service;
 
 import com.dgex.backend.entity.Exchange;
+import com.dgex.backend.entity.User;
 import com.dgex.backend.repository.ExchangeRepository;
+import com.dgex.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,6 +18,7 @@ import java.util.*;
 public class ExchangeService {
 
     private final ExchangeRepository exchangeRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public Object getList(Integer page, Integer searchKey,  String searchWord) {
@@ -89,5 +92,49 @@ public class ExchangeService {
         exchange.setCreateDatetime(new Date());
         exchange.setStatus("신청");
         exchangeRepository.save(exchange);
+    }
+
+    @Transactional
+    public Map<String,Object> insertBook(String identifyNumber, String txId,Double amount,String txidTime ){
+        Map<String,Object> result = new HashMap<>();
+        User user = userRepository.findByDeleteDatetimeIsNullAndIdentifyNumber(identifyNumber);
+
+        if(user == null){
+            result.put("code", "0001");
+            result.put("msg", "등록된 회원이 없거나 탈퇴한 회원입니다.");
+        }else{
+            Exchange exchange = new Exchange();
+            exchange.setUser(user);
+            exchange.setAmount(amount);
+            exchange.setCreateDatetime(new Date());
+            exchange.setTxId(txId);
+            exchange.setTxIdDatetime(txidTime);
+            exchange.setTradeType("IN");
+
+            exchangeRepository.save(exchange);
+
+            result.put("code", "0000");
+            result.put("msg", "정상적으로 등록되었습니다.");
+        }
+
+        return result;
+
+
+
+    }
+
+    @Transactional
+    public Object checkBook(String txId, Double amount) {
+        Exchange exchange = exchangeRepository.findByDeleteDatetimeIsNullAndTxIdAndAmount(txId, amount);
+
+        Map<String, Object> result = new HashMap<>();
+
+        if(exchange != null){
+            result.put("result", true);
+        }else{
+            result.put("result", false);
+        }
+
+        return result;
     }
 }

@@ -24,6 +24,9 @@ spring:
   logging:
     config: classpath:logback.xml
 
+  jwt:
+    secret: govlepel@$&amp;
+
   mail:
     host: smtp.gmail.com
     port: 465

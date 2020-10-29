@@ -288,6 +288,21 @@ public class UserService {
     }
 
     @Transactional
+    public Object userInfo(String identifyNumber) {
+        User user = userRepository.findByDeleteDatetimeIsNullAndIdentifyNumber(identifyNumber);
+
+        Map<String, Object> result = new HashMap<>();
+
+        if(user != null){
+            result.put("result", true);
+        }else{
+            result.put("result", false);
+        }
+
+        return result;
+    }
+
+    @Transactional
     public Object findByEmailId(String emailId) {
         User user = userRepository.findByDeleteDatetimeIsNullAndEmailId(emailId);
 //        List<Exchange> exchangeList = exchangeRepository.findByDeleteDatetimeIsNullAndUser(user);
