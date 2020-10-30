@@ -107,6 +107,15 @@ public class UserController {
         return responseService.getSuccessResult();
     }
 
+    @ApiOperation(value = "OTP 초기화")
+    @PostMapping(value = "/userOtpInit")
+    public CommonResult userOtpInit(
+            @RequestParam(value = "userId", required = false) Integer userId
+    ) {
+        userService.userOtpInit(userId);
+        return responseService.getSuccessResult();
+    }
+
     @ApiOperation(value = "관리자 수정", notes = "회원 정보를 수정한다.")
     @PostMapping(value = "/updateAdmin")
     public CommonResult updateAdmin(

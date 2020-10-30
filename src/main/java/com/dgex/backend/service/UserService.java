@@ -281,6 +281,16 @@ public class UserService {
     }
 
     @Transactional
+    public void userOtpInit(Integer userId) {
+        User user = userRepository.findById(userId).get();
+        user.setOtpKey(null);
+        user.setUpdateDatetime(new Date());
+        userRepository.save(user);
+    }
+
+
+
+    @Transactional
     public void updateUser(Integer userId,String address,String addressDetail,String phoneNumber, String password) {
         User user = userRepository.findById(userId).get();
         if(address != null){

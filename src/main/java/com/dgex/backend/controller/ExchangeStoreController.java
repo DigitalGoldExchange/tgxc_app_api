@@ -21,9 +21,11 @@ public class ExchangeStoreController {
     @ApiOperation(value = "교환매장 등록", notes = "입력한 교환비율 정보를 등록한다.")
     @PostMapping(value = "/insert")
     public CommonResult insert(
-            @RequestParam(value = "name", required = false) String name
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "address", required = false) String address,
+            @RequestParam(value = "phoneNumber", required = false) String phoneNumber
     ) {
-        exchangeStoreService.insert(name);
+        exchangeStoreService.insert(name, address,phoneNumber);
         return responseService.getSuccessResult();
     }
 

@@ -21,10 +21,12 @@ public class ExchangeStoreService {
     private final ExchangeStoreRepository exchangeStoreRepository;
 
     @Transactional
-    public void insert(String name) {
+    public void insert(String name,String address,String phoneNumber) {
         ExchangeStore store = new ExchangeStore();
         store.setCreateDatetime(new Date());
         store.setStoreName(name);
+        store.setStoreAddr(address);
+        store.setStorePhoneNumber(phoneNumber);
         store.setDispYn("N");
         exchangeStoreRepository.save(store);
     }

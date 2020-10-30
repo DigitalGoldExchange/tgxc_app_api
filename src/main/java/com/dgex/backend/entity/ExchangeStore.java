@@ -26,6 +26,15 @@ public class ExchangeStore {
     @ApiModelProperty(value = "매장명", required = true)
     private String storeName;
 
+    //주소
+    @Column
+    @ApiModelProperty(value = "주소", required = true)
+    private String storeAddr;
+
+    @Column
+    @ApiModelProperty(value = "전화번호", required = true)
+    private String storePhoneNumber;
+
     //활성화여부
     @Column
     @ApiModelProperty(value = "활성화여부", required = true)
