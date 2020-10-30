@@ -21,7 +21,7 @@ import java.util.UUID;
 @Service
 public class FileManageService {
 
-    @Value("${upload.dir}")
+    @Value("${upload.url}")
     private String uploadDir;
     private Path fileStorageLocation;
 

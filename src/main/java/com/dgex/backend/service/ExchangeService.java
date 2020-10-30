@@ -84,12 +84,13 @@ public class ExchangeService {
         Exchange exchange = exchangeRepository.findById(exchangeId).get();
 
         List<Exchange> exchangeList = exchangeRepository.findByDeleteDatetimeIsNullAndUser(exchange.getUser());
-
+        UserExchangeImage userExchangeImages = userExchangeImageRepository.findByDeleteDatetimeIsNullAndExchange(exchange);
 
         Map<String, Object> result = new HashMap<>();
 
         result.put("exchangeInfo", exchange);
         result.put("exchangeList", exchangeList);
+        result.put("userExchangeImages", userExchangeImages);
         return result;
     }
 
@@ -121,6 +122,8 @@ public class ExchangeService {
     public void insertExchange(Integer userId, String exchangeMethod, String walletAddr, Double reqAmount, MultipartFile identifyCard,MultipartFile profileImage) {
 
         User user = userRepository.findById(userId).get();
+        user.setTotalTg(user.getTotalTg() - reqAmount);
+        userRepository.save(user);
 
         Exchange exchange = new Exchange();
         exchange.setCreateDatetime(new Date());

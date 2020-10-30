@@ -13,6 +13,8 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.InvalidKeyException;
+import java.security.SignatureException;
 import java.util.Map;
 
 @Api(tags = {"Api"})
@@ -29,11 +31,17 @@ public class ApiController {
 
     @ApiOperation(value = "회원고유번호확인")
     @GetMapping(value = "/userInfo")
-    public SingleResult<Object> userInfo(
+    public CommonResult userInfo(
             @RequestParam(value = "userId") String identifyNumber,
             @RequestHeader(value = "token") String token
-    ) {
-        return responseService.getSingleResult(userService.userInfo(identifyNumber,token));
+    ) throws SignatureException {
+        Map<String, Object> result = userService.userInfo(identifyNumber,token);
+        if(result.get("code")=="0000"){
+            return responseService.getSuccessResult();
+        }else{
+            return responseService.getFailResult(0000, result.get("msg").toString());
+        }
+//        return responseService.getSingleResult();
     }
 
     @ApiOperation(value = "장부등록")

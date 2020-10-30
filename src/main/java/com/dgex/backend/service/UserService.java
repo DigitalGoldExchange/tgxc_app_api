@@ -3,9 +3,11 @@ package com.dgex.backend.service;
 import ch.qos.logback.core.encoder.EchoEncoder;
 import com.dgex.backend.config.JwtTokenProvider;
 import com.dgex.backend.entity.Exchange;
+import com.dgex.backend.entity.PushInfo;
 import com.dgex.backend.entity.User;
 import com.dgex.backend.entity.UserPassportImage;
 import com.dgex.backend.repository.ExchangeRepository;
+import com.dgex.backend.repository.PushInfoRepository;
 import com.dgex.backend.repository.UserPassportImageRepository;
 import com.dgex.backend.repository.UserRepository;
 import com.dgex.backend.service.common.FileManageService;
@@ -47,6 +49,7 @@ public class UserService {
     private final FileManageService fileManageService;
     private final UserPassportImageRepository userPassportImageRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final PushInfoRepository pushInfoRepository;
 
     @Autowired
     private JavaMailSender mailSender;
@@ -115,7 +118,7 @@ public class UserService {
             if(user.getKoreanYn().equals("Y")){
                 user.setStatus(2);
             }else{
-                user.setStatus(1);
+                user.setStatus(4);
             }
             user.setUpdateDatetime(new Date());
             userRepository.save(user);
@@ -221,20 +224,24 @@ public class UserService {
         Sort sort = Sort.by(Sort.Direction.DESC,"createDatetime");
 
         if(searchKey == 1 && searchWord!=null){   //이메일 검색
-            Page<User> pageList = userRepository.findByEmailIdAndDeleteDatetimeIsNull("%"+searchWord+"%", PageRequest.of(page-1,10, sort));
+//            Page<User> pageList = userRepository.findByEmailIdAndDeleteDatetimeIsNull("%"+searchWord+"%", PageRequest.of(page-1,10, sort));
+            Page<User> pageList = userRepository.findByEmailId("%"+searchWord+"%", PageRequest.of(page-1,10, sort));
             list = pageList.toList();
             totalPages = pageList.getTotalPages();
 
         }else if(searchKey == 2 && searchWord!=null){  //이름 검색
-            Page<User> pageList = userRepository.findByNameAndDeleteDatetimeIsNull("%"+searchWord+"%", PageRequest.of(page-1,10, sort));
+//            Page<User> pageList = userRepository.findByNameAndDeleteDatetimeIsNull("%"+searchWord+"%", PageRequest.of(page-1,10, sort));
+            Page<User> pageList = userRepository.findByName("%"+searchWord+"%", PageRequest.of(page-1,10, sort));
             list = pageList.toList();
             totalPages = pageList.getTotalPages();
         }else if(searchKey == 3 && searchWord!=null){
-            Page<User> pageList = userRepository.findByPhoneNumberAndDeleteDatetimeIsNull("%"+searchWord+"%", PageRequest.of(page-1,10, sort));
+//            Page<User> pageList = userRepository.findByPhoneNumberAndDeleteDatetimeIsNull("%"+searchWord+"%", PageRequest.of(page-1,10, sort));
+            Page<User> pageList = userRepository.findByPhoneNumber("%"+searchWord+"%", PageRequest.of(page-1,10, sort));
             list = pageList.toList();
             totalPages = pageList.getTotalPages();
         }else{
-            Page<User> pageList = userRepository.findByDeleteDatetimeIsNullAndLevel("USER", PageRequest.of(page-1, 10, sort));
+//            Page<User> pageList = userRepository.findByDeleteDatetimeIsNullAndLevel("USER", PageRequest.of(page-1, 10, sort));
+            Page<User> pageList = userRepository.findByLevel("USER", PageRequest.of(page-1, 10, sort));
             list = pageList.toList();
             totalPages = pageList.getTotalPages();
         }
@@ -305,32 +312,47 @@ public class UserService {
     public Object findByUserInfo(Integer userId) {
         User user = userRepository.findById(userId).get();
         List<Exchange> exchangeList = exchangeRepository.findByDeleteDatetimeIsNullAndUser(user);
-
+        Integer unreadPushCount = pushInfoRepository.countByDeleteDatetimeIsNullAndUserAndReadYn(user, "N");
         Map<String, Object> result = new HashMap<>();
 
         result.put("exchangeList", exchangeList);
         result.put("user",user);
+        if(unreadPushCount > 0 ){
+            result.put("unreadPushCount", true);
+        }else{
+            result.put("unreadPushCount", false);
+        }
+
 
         return result;
     }
 
     @Transactional
-    public Object userInfo(String identifyNumber, String token) {
+    public Map<String, Object>  userInfo(String identifyNumber, String token) throws SignatureException {
         User user = userRepository.findByDeleteDatetimeIsNullAndIdentifyNumber(identifyNumber);
         Map<String, Object> result = new HashMap<>();
-        if (token != null && jwtTokenProvider.validateToken(token)) {
+        try{
+            if (token != null && jwtTokenProvider.validateToken(token)) {
 //            Authentication auth = jwtTokenProvider.getAuthentication(token);
 //            SecurityContextHolder.getContext().setAuthentication(auth);
-            if(user != null){
-                result.put("result", true);
+                if(user != null){
+                    result.put("result", true);
+                    result.put("code","0000");
+                    result.put("msg","정상 처리");
+                }else{
+                    result.put("result", false);
+                    result.put("code","0001");
+                    result.put("msg","등록된 회원이 없습니다.");
+                }
             }else{
                 result.put("result", false);
+                result.put("msg", "토큰이 유효하지 않습니다.");
             }
-        }else{
+        }catch (Exception e){
             result.put("result", false);
-            result.put("msg", "토큰이 유효하지 않습니다.");
+            result.put("code","0001");
+            result.put("msg","token invalid");
         }
-
 
         return result;
     }

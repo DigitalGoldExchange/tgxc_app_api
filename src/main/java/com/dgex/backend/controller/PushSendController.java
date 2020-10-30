@@ -8,10 +8,7 @@ import com.dgex.backend.service.ResponseService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @Api(tags = {"PushInfo : 푸시(PushInfo)"})
@@ -23,7 +20,7 @@ public class PushSendController {
     private final ResponseService responseService;
     private final PushInfoService pushInfoService;
 
-    @ApiOperation(value = "회원 등록", notes = "입력한 회원 정보를 등록한다.")
+    @ApiOperation(value = "푸시 등록", notes = "입력한 회원 정보를 등록한다.")
     @PostMapping(value = "/sendPush")
     public SingleResult<Object> sendPush(
             @RequestParam(value = "userId", required = false) Integer userId,
@@ -33,5 +30,13 @@ public class PushSendController {
     ) {
 
         return responseService.getSingleResult(pushInfoService.sendPush(userId, title, content));
+    }
+
+    @ApiOperation(value = "푸시 단건 조회", notes = "회원 pk (userId)를 받아 해당 회원의 정보를 조회한다.")
+    @GetMapping(value = "/userPushList")
+    public SingleResult<Object> userPushList(
+            @RequestParam(value = "userId", required = false) Integer userId
+    ) {
+        return responseService.getSingleResult(pushInfoService.userPushList(userId));
     }
 }

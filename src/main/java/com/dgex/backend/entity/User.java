@@ -73,7 +73,7 @@ public class User {
     @Column
     private String menuLevel;
 
-    //상태(0:미인증 1:비활성화 2:활성화 3:탈퇴)
+    //상태(0:미인증 1:비활성화 2:활성화 3:탈퇴 4:KYC확인)
     @Column
     private Integer status;
 

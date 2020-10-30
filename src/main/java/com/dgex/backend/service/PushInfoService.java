@@ -1,5 +1,6 @@
 package com.dgex.backend.service;
 
+import com.dgex.backend.entity.Exchange;
 import com.dgex.backend.entity.PushInfo;
 import com.dgex.backend.entity.User;
 import com.dgex.backend.repository.PushInfoRepository;
@@ -70,6 +71,23 @@ public class PushInfoService {
             result.put("msg", "푸시 전송 실패");
             result.put("result", false);
         }
+
+        return result;
+    }
+
+
+
+    @Transactional
+    public Object userPushList(Integer userId) {
+        User user = userRepository.findById(userId).get();
+        List<PushInfo> pushInfoList = pushInfoRepository.findByDeleteDatetimeIsNullAndUser(user);
+        for(int i=0; i < pushInfoList.size(); i++){
+            System.out.println(pushInfoList.get(i).getContents());
+        }
+
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("pushList", pushInfoList);
 
         return result;
     }

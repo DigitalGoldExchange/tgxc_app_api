@@ -45,4 +45,5 @@ spring:
           protocol: smtps
     default-encoding: UTF-8
 
-upload.dir: ./uploads
+upload:
+  url: localhost:8093
