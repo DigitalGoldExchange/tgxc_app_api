@@ -32,6 +32,16 @@ public class ExchangeStoreService {
     }
 
     @Transactional
+    public void update(Integer storeId, String name,String address,String phoneNumber) {
+        ExchangeStore store = exchangeStoreRepository.findById(storeId).get();
+        store.setUpdateDatetime(new Date());
+        store.setStoreName(name);
+        store.setStoreAddr(address);
+        store.setStorePhoneNumber(phoneNumber);
+        exchangeStoreRepository.save(store);
+    }
+
+    @Transactional
     public Object getInactiveStoreList(){
         Map<String, Object> result = new HashMap<>();
 
@@ -83,4 +93,16 @@ public class ExchangeStoreService {
             exchangeStoreRepository.save(store);
         }
     }
+
+    @Transactional
+    public Object getOne(Integer storeId){
+        Map<String, Object> result = new HashMap<>();
+
+        ExchangeStore exchangeStore = exchangeStoreRepository.findById(storeId).get();
+
+        result.put("exchangeStore", exchangeStore);
+        return result;
+    }
+
+
 }

@@ -52,6 +52,18 @@ public class ExchangeStoreController {
         return responseService.getSuccessResult();
     }
 
+    @ApiOperation(value = "교환매장 수")
+    @PostMapping(value = "/update")
+    public CommonResult update(
+            @RequestParam(value = "storeId", required = false) Integer storeId,
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "address", required = false) String address,
+            @RequestParam(value = "phoneNumber", required = false) String phoneNumber
+    ) {
+        exchangeStoreService.update(storeId, name, address, phoneNumber);
+        return responseService.getSuccessResult();
+    }
+
     @ApiOperation(value = "교환매장 비활성화")
     @PostMapping(value = "/inactiveUpdate")
     public CommonResult inactiveUpdate(
@@ -68,6 +80,14 @@ public class ExchangeStoreController {
     ) {
         exchangeStoreService.activeUpdate(storeId);
         return responseService.getSuccessResult();
+    }
+
+    @ApiOperation(value = "교환매장 단건 조회", notes = "회원 pk (userId)를 받아 해당 회원의 정보를 조회한다.")
+    @GetMapping(value = "/getOne")
+    public SingleResult<Object> getOne(
+            @RequestParam(value = "storeId", required = false) Integer storeId
+    ) {
+        return responseService.getSingleResult(exchangeStoreService.getOne(storeId));
     }
 
 
