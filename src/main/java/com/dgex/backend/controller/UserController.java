@@ -173,9 +173,10 @@ public class UserController {
             @RequestParam(value = "emailId", required = false) String emailId,
             @RequestParam(value = "password", required = false) String password,
             @RequestParam(value = "deviceToken", required = false) String deviceToken,
-            @RequestParam(value = "deviceType", required = false) String deviceType
+            @RequestParam(value = "deviceType", required = false) String deviceType,
+            @RequestParam(value = "role", required = false) String role
     ) {
-        return responseService.getSingleResult(userService.loginCheck(emailId, password, deviceToken, deviceType));
+        return responseService.getSingleResult(userService.loginCheck(emailId, password, deviceToken, deviceType,role));
     }
 
     @ApiOperation(value = "회원 삭제", notes = "입력한 회원 정보를 삭제한다.")
@@ -257,9 +258,10 @@ public class UserController {
             @RequestParam(value = "address", required = false) String address,
             @RequestParam(value = "addressDetail", required = false) String addressDetail,
             @RequestParam(value = "phoneNumber", required = false) String phoneNumber,
-            @RequestParam(value = "password", required = false) String password
+            @RequestParam(value = "password", required = false) String password,
+            @RequestParam(value = "zipCode", required = false) String zipCode
     ) {
-        userService.updateUser(userId, address, addressDetail, phoneNumber, password);
+        userService.updateUser(userId, address, addressDetail, phoneNumber, password, zipCode);
         return responseService.getSuccessResult();
     }
 

@@ -291,7 +291,7 @@ public class UserService {
 
 
     @Transactional
-    public void updateUser(Integer userId,String address,String addressDetail,String phoneNumber, String password) {
+    public void updateUser(Integer userId,String address,String addressDetail,String phoneNumber, String password, String zipCode) {
         User user = userRepository.findById(userId).get();
         if(address != null){
             user.setAddress(address);
@@ -301,6 +301,9 @@ public class UserService {
         }
         if(phoneNumber != null){
             user.setPhoneNumber(phoneNumber);
+        }
+        if(zipCode != null){
+            user.setZipCode(zipCode);
         }
         if(password != null) {
             BCryptPasswordEncoder pe = new BCryptPasswordEncoder();
@@ -389,9 +392,14 @@ public class UserService {
     }
 
     @Transactional
-    public Object loginCheck(String emailId, String password, String deviceToken, String deviceType) {
+    public Object loginCheck(String emailId, String password, String deviceToken, String deviceType, String role) {
         Map<String, Object> result = new HashMap<>();
-        User user = userRepository.findByDeleteDatetimeIsNullAndEmailId(emailId);
+        User user = null;
+        if("admin".equals(role)){
+            user = userRepository.findByDeleteDatetimeIsNullAndEmailIdAndLevelIsNot(emailId, "USER");
+        }else{
+            user = userRepository.findByDeleteDatetimeIsNullAndEmailId(emailId);
+        }
 
         if(user == null){
             result.put("result", false);
