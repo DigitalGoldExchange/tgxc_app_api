@@ -19,6 +19,8 @@ public interface ExchangeRepository extends JpaRepository<Exchange, Integer> {
 
     Exchange findByDeleteDatetimeIsNullAndTxIdAndAmount(String txId, Double amount);
 
+    List<Exchange> findByDeleteDatetimeIsNullAndUserAndTradeType(User user, String type);
+
 
     @Query("select ex FROM Exchange ex where ex.deleteDatetime is null and ex.user.emailId like :searchWord")
     Page<Exchange> findByEmailIdAndDeleteDatetimeIsNull(@Param("searchWord") String searchWord, Pageable pageable);

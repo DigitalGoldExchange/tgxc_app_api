@@ -95,6 +95,32 @@ public class ExchangeService {
     }
 
     @Transactional
+    public Object findByType(Integer userId, String type) {
+        String tradeType = null;
+        List<Exchange> exchangeList;
+        User user = userRepository.findById(userId).get();
+
+        if("전체내역".equals(type)){
+            exchangeList = exchangeRepository.findByDeleteDatetimeIsNullAndUser(user);
+        }else{
+            if("입금".equals(type)){
+                tradeType = "IN";
+            }else if("출금".equals(type)){
+                tradeType = "OUT";
+            }else{
+                tradeType = "EXCHANGE";
+            }
+
+            exchangeList = exchangeRepository.findByDeleteDatetimeIsNullAndUserAndTradeType(user, tradeType);
+        }
+
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("exchangeList", exchangeList);
+        return result;
+    }
+
+    @Transactional
     public void insert(Exchange exchange) {
         exchange.setCreateDatetime(new Date());
         exchange.setStatus("신청");

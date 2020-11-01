@@ -49,6 +49,17 @@ public class ExchangeController {
         return responseService.getSingleResult(exchangeService.findByExchangeInfo(exchangeId));
     }
 
+    @ApiOperation(value = "거래 단건 조회", notes = "거래 pk (exchangeId)를 받아 해당 회원의 정보를 조회한다.")
+    @GetMapping(value = "/findByType")
+    public SingleResult<Object> findByType(
+            @RequestParam(value = "userId", required = false) Integer userId,
+            @RequestParam(value = "type", required = false) String type
+    ) {
+        return responseService.getSingleResult(exchangeService.findByType(userId, type));
+    }
+
+
+
     @ApiOperation(value = "교환 등록")
     @PostMapping(value = "/insert")
     public CommonResult insert(Exchange exchange) throws Exception {
