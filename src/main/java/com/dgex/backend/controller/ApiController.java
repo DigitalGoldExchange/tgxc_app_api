@@ -50,9 +50,10 @@ public class ApiController {
             @RequestParam(value = "userId") String identifyNumber,
             @RequestParam(value = "txid") String txId,
             @RequestParam(value = "amount") Double amount,
-            @RequestParam(value = "txidTime") String txidTime
-    ) {
-        Map<String, Object> result = exchangeService.insertBook(identifyNumber,txId, amount, txidTime);
+            @RequestParam(value = "txidTime") String txidTime,
+            @RequestHeader(value = "token") String token
+    ) throws SignatureException {
+        Map<String, Object> result = exchangeService.insertBook(identifyNumber,txId, amount, txidTime, token);
         if(result.get("code")=="0000"){
             return responseService.getSuccessResult();
         }else{
@@ -64,9 +65,10 @@ public class ApiController {
     @GetMapping(value = "/checkBook")
     public SingleResult<Object> checkBook(
             @RequestParam(value = "txid") String txId,
-            @RequestParam(value = "amount") Double amount
-    ) {
-        return responseService.getSingleResult(exchangeService.checkBook(txId, amount));
+            @RequestParam(value = "amount") Double amount,
+            @RequestHeader(value = "token") String token
+    ) throws SignatureException {
+        return responseService.getSingleResult(exchangeService.checkBook(txId, amount, token));
     }
 
 

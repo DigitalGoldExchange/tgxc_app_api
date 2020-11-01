@@ -1,5 +1,6 @@
 package com.dgex.backend.service;
 
+import com.dgex.backend.config.JwtTokenProvider;
 import com.dgex.backend.entity.Exchange;
 import com.dgex.backend.entity.User;
 import com.dgex.backend.entity.UserExchangeImage;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.SignatureException;
 import java.util.*;
 
 @Service
@@ -25,6 +27,7 @@ public class ExchangeService {
     private final UserRepository userRepository;
     private final FileManageService fileManageService;
     private final UserExchangeImageRepository userExchangeImageRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
     public Object getList(Integer page, Integer searchKey,  String searchWord) {
@@ -225,27 +228,41 @@ public class ExchangeService {
 
 
     @Transactional
-    public Map<String,Object> insertBook(String identifyNumber, String txId,Double amount,String txidTime ){
+    public Map<String,Object> insertBook(String identifyNumber, String txId,Double amount,String txidTime, String token ) throws SignatureException
+        {
         Map<String,Object> result = new HashMap<>();
         User user = userRepository.findByDeleteDatetimeIsNullAndIdentifyNumber(identifyNumber);
 
-        if(user == null){
-            result.put("code", "0001");
-            result.put("msg", "등록된 회원이 없거나 탈퇴한 회원입니다.");
-        }else{
-            Exchange exchange = new Exchange();
-            exchange.setUser(user);
-            exchange.setAmount(amount);
-            exchange.setCreateDatetime(new Date());
-            exchange.setTxId(txId);
-            exchange.setTxIdDatetime(txidTime);
-            exchange.setTradeType("IN");
+        try{
+            if(token != null && jwtTokenProvider.validateToken(token)){
+                if(user == null){
+                    result.put("code", "0001");
+                    result.put("msg", "등록된 회원이 없거나 탈퇴한 회원입니다.");
+                }else{
+                    Exchange exchange = new Exchange();
+                    exchange.setUser(user);
+                    exchange.setAmount(amount);
+                    exchange.setCreateDatetime(new Date());
+                    exchange.setTxId(txId);
+                    exchange.setTxIdDatetime(txidTime);
+                    exchange.setTradeType("IN");
 
-            exchangeRepository.save(exchange);
+                    exchangeRepository.save(exchange);
 
-            result.put("code", "0000");
-            result.put("msg", "정상적으로 등록되었습니다.");
+                    result.put("code", "0000");
+                    result.put("msg", "정상적으로 등록되었습니다.");
+                }
+            }else{
+                result.put("result", false);
+                result.put("msg", "토큰이 유효하지 않습니다.");
+            }
+
+        }catch (Exception e){
+            result.put("result", false);
+            result.put("code","0001");
+            result.put("msg","token invalid");
         }
+
 
         return result;
 
@@ -254,16 +271,30 @@ public class ExchangeService {
     }
 
     @Transactional
-    public Object checkBook(String txId, Double amount) {
+    public Object checkBook(String txId, Double amount,String token) throws SignatureException{
         Exchange exchange = exchangeRepository.findByDeleteDatetimeIsNullAndTxIdAndAmount(txId, amount);
-
         Map<String, Object> result = new HashMap<>();
 
-        if(exchange != null){
-            result.put("result", true);
-        }else{
+        try{
+            if(token != null && jwtTokenProvider.validateToken(token)){
+                if(exchange != null){
+                    result.put("result", true);
+                    result.put("msg", "내역이 존재합니다.");
+                }else{
+                    result.put("result", false);
+                    result.put("msg", "내역이 존재하지 않습니다.");
+                }
+            }else{
+                result.put("result", false);
+                result.put("msg", "토큰이 유효하지 않습니다.");
+            }
+
+        }catch (Exception e){
             result.put("result", false);
+            result.put("code","0001");
+            result.put("msg","token invalid");
         }
+
 
         return result;
     }
