@@ -370,6 +370,32 @@ public class UserService {
         return result;
     }
 
+    @Transactional
+    public Map<String, Object> refreshToken(String token) throws SignatureException {
+        Map<String, Object> result = new HashMap<>();
+
+        try{
+            if (token != null && jwtTokenProvider.validateToken(token)) {
+//            Authentication auth = jwtTokenProvider.getAuthentication(token);
+//            SecurityContextHolder.getContext().setAuthentication(auth);
+                result.put("result", true);
+                result.put("msg", "토큰이 유효합니다.");
+            }else{
+                User user = jwtTokenProvider.getAuthUserInfo(token);
+                result.put("refreshToken",jwtTokenProvider.createRefreshToken(String.valueOf(user.getUserId())));
+                result.put("result", false);
+                result.put("msg", "토큰이 유효하지 않습니다.");
+
+            }
+        }catch (Exception e){
+            result.put("result", false);
+            result.put("code","0001");
+            result.put("msg","token invalid");
+        }
+
+        return result;
+    }
+
 
 
     @Transactional

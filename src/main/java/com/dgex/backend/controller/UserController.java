@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 import java.util.Base64;
 import java.util.Map;
 
@@ -87,6 +88,14 @@ public class UserController {
                                         @RequestParam(defaultValue = "1", required = false) Integer page
     ) {
         return responseService.getSingleResult(userService.getList(page, searchKey, searchWord));
+    }
+
+    @ApiOperation(value = "회원 리스트", notes = "회원 pk (userId)를 역방향(최신순)으로 정렬한 리스트를 조회한다.")
+    @GetMapping(value = "/refreshToken")
+    public SingleResult<Object> refreshToken(
+            @RequestHeader(value = "token") String token
+    ) throws SignatureException {
+        return responseService.getSingleResult(userService.refreshToken(token));
     }
 
     @ApiOperation(value = "관리자 리스트", notes = "회원 pk (userId)를 역방향(최신순)으로 정렬한 리스트를 조회한다.")

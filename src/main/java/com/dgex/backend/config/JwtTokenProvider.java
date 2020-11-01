@@ -33,6 +33,7 @@ public class JwtTokenProvider {
     private final ResponseService responseService;
 
     private long tokenValidMilisecond = 1000L * 60 * 60 * 24; // 24시간만 토큰 유효
+    private long refreshTokenValidMilisecond = 1000L * 60 * 60 * 48; // 48시간만 토큰 유효
 
     @PostConstruct
     protected void init() {
@@ -53,22 +54,51 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setClaims(claims) // 데이터
                 .setIssuedAt(now) // 토큰 발행일자
-//                .setExpiration(new Date(now.getTime() + tokenValidMilisecond)) // set Expire Time
+                .setExpiration(new Date(now.getTime() + tokenValidMilisecond)) // set Expire Time
+//                .setExpiration(new Date(now.getTime()+10000))
+                .signWith(SignatureAlgorithm.HS256, secretKey) // 암호화 알고리즘, secret값 세팅
+                .compact();
+    }
+
+    // Jwt 토큰 생성
+    public String createRefreshToken(String userPk) {
+        Claims claims = Jwts.claims().setSubject(userPk);
+        //role 필요 없을듯
+//        claims.put("roles", roles);
+        Date now = new Date();
+        return Jwts.builder()
+                .setClaims(claims) // 데이터
+                .setIssuedAt(now) // 토큰 발행일자
+                .setExpiration(new Date(now.getTime() + refreshTokenValidMilisecond)) // set Expire Time
 //                .setExpiration(new Date(now.getTime()+10000))
                 .signWith(SignatureAlgorithm.HS256, secretKey) // 암호화 알고리즘, secret값 세팅
                 .compact();
     }
 
     // Jwt 토큰으로 인증 정보를 조회
-    public CommonResult getAuthentication(String token) {
+    public SingleResult<Object> getAuthentication(String token) {
         Map<String, Object> result = new HashMap<>();
         User user = userRepository.findById(Integer.parseInt(this.getUserPk(token))).get();
 
         if(user != null){
-            return responseService.getSuccessResult();
+            result.put("result", true);
+            result.put("msg", "유효한 토큰입니다.");
+            result.put("user", user);
+            return responseService.getSingleResult(result);
         }else{
             result.put("msg","토큰 정보가 유효하지 않습니다.");
-            return responseService.getFailResult(0001, result.get("msg").toString());
+            result.put("result", false);
+            return responseService.getSingleResult(result);
+        }
+
+    }
+
+    public User getAuthUserInfo(String token){
+        User user = userRepository.findById(Integer.parseInt(this.getUserPk(token))).get();
+        if(user != null){
+            return user;
+        }else{
+            return null;
         }
 
     }
