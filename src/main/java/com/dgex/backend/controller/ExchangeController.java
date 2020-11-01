@@ -30,6 +30,16 @@ public class ExchangeController {
         return responseService.getSingleResult(exchangeService.getList(page, searchKey, searchWord));
     }
 
+    @ApiOperation(value = "거래내역 리스트")
+    @GetMapping(value = "/getDepositList")
+    public SingleResult<Object> getDepositList(
+            @RequestParam(value = "searchKey", required = false) Integer searchKey,
+            @RequestParam(value = "searchWord", required = false) String searchWord,
+            @RequestParam(defaultValue = "1", required = false) Integer page
+    ) {
+        return responseService.getSingleResult(exchangeService.getDepositList(page, searchKey, searchWord));
+    }
+
     @ApiOperation(value = "거래 수정", notes = "거래 정보를 수정한다.")
     @PostMapping(value = "/update")
     public CommonResult update(
@@ -38,6 +48,17 @@ public class ExchangeController {
             @RequestParam(value = "note", required = false) String note
     ) {
         exchangeService.update(exchangeId, status, note);
+        return responseService.getSuccessResult();
+    }
+
+    @ApiOperation(value = "거래 수정", notes = "거래 정보를 수정한다.")
+    @PostMapping(value = "/depositUpdate")
+    public CommonResult depositUpdate(
+            @RequestParam(value = "exchangeId", required = false) Integer exchangeId,
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "txid", required = false) String txid
+    ) {
+        exchangeService.depositUpdate(exchangeId, status, txid);
         return responseService.getSuccessResult();
     }
 

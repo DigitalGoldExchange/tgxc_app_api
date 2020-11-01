@@ -67,6 +67,46 @@ public class ExchangeService {
     }
 
     @Transactional
+    public Object getDepositList(Integer page, Integer searchKey,  String searchWord) {
+        Map<String, Object> result = new HashMap<>();
+        List<Exchange> list;
+        Integer totalPages;
+
+        if(searchKey == null){
+            searchKey = 0;
+        }
+
+        Sort sort = Sort.by(Sort.Direction.DESC,"createDatetime");
+        if(searchKey == 1 && searchWord!=null){   //이메일 검색
+            Page<Exchange> pageList = exchangeRepository.findByEmailIdAndDeleteDatetimeIsNullAndTradeType("%"+searchWord+"%","OUT", PageRequest.of(page-1,10, sort));
+            list = pageList.toList();
+            totalPages = pageList.getTotalPages();
+
+        }else if(searchKey == 2 && searchWord!=null){  //이름 검색
+            Page<Exchange> pageList = exchangeRepository.findByNameAndDeleteDatetimeIsNullAndTradeType("%"+searchWord+"%","OUT", PageRequest.of(page-1,10, sort));
+            list = pageList.toList();
+            totalPages = pageList.getTotalPages();
+        }else if(searchKey == 3 && searchWord!=null){ //신청번호 검색
+            Page<Exchange> pageList = exchangeRepository.findByReqNumberAndDeleteDatetimeIsNullAndTradeType("%"+searchWord+"%", "OUT",PageRequest.of(page-1,10, sort));
+            list = pageList.toList();
+            totalPages = pageList.getTotalPages();
+        }else if(searchKey == 4 && searchWord!=null){   //진행상황 검색
+            Page<Exchange> pageList = exchangeRepository.findByStatusAndDeleteDatetimeIsNullAndTradeType("%"+searchWord+"%", "OUT", PageRequest.of(page-1,10, sort));
+            list = pageList.toList();
+            totalPages = pageList.getTotalPages();
+        }else{
+            Page<Exchange> pageList = exchangeRepository.findByDeleteDatetimeIsNullAndTradeType("OUT", PageRequest.of(page-1, 10, sort));
+            list = pageList.toList();
+            totalPages = pageList.getTotalPages();
+        }
+
+        result.put("list",list);
+        result.put("totalPages",totalPages);
+
+        return result;
+    }
+
+    @Transactional
     public void update(Integer exchangeId, String status, String note) {
         Exchange exchange = exchangeRepository.findById(exchangeId).get();
         if(note != null){
@@ -80,16 +120,26 @@ public class ExchangeService {
     }
 
     @Transactional
+    public void depositUpdate(Integer exchangeId, String status, String txid) {
+        Exchange exchange = exchangeRepository.findById(exchangeId).get();
+        exchange.setTxId(txid);
+        exchange.setStatus(status);
+        exchange.setUpdateDatetime(new Date());
+        exchangeRepository.save(exchange);
+    }
+
+    @Transactional
     public Object findByExchangeInfo(Integer exchangeId) {
         Exchange exchange = exchangeRepository.findById(exchangeId).get();
-
-        List<Exchange> exchangeList = exchangeRepository.findByDeleteDatetimeIsNullAndUser(exchange.getUser());
+        List<Exchange> exchangeList = exchangeRepository.findByDeleteDatetimeIsNullAndUserOrderByCreateDatetimeDesc(exchange.getUser());
         UserExchangeImage userExchangeImages = userExchangeImageRepository.findByDeleteDatetimeIsNullAndExchange(exchange);
+        List<Exchange> depositList = exchangeRepository.findByDeleteDatetimeIsNullDeposit("OUT");
 
         Map<String, Object> result = new HashMap<>();
 
         result.put("exchangeInfo", exchange);
         result.put("exchangeList", exchangeList);
+        result.put("depositList", depositList);
         result.put("userExchangeImages", userExchangeImages);
         return result;
     }
@@ -101,7 +151,7 @@ public class ExchangeService {
         User user = userRepository.findById(userId).get();
 
         if("전체내역".equals(type)){
-            exchangeList = exchangeRepository.findByDeleteDatetimeIsNullAndUser(user);
+            exchangeList = exchangeRepository.findByDeleteDatetimeIsNullAndUserOrderByCreateDatetimeDesc(user);
         }else{
             if("입금".equals(type)){
                 tradeType = "IN";
@@ -111,7 +161,7 @@ public class ExchangeService {
                 tradeType = "EXCHANGE";
             }
 
-            exchangeList = exchangeRepository.findByDeleteDatetimeIsNullAndUserAndTradeType(user, tradeType);
+            exchangeList = exchangeRepository.findByDeleteDatetimeIsNullAndUserAndTradeTypeOrderByCreateDatetimeDesc(user, tradeType);
         }
 
         Map<String, Object> result = new HashMap<>();
@@ -145,7 +195,7 @@ public class ExchangeService {
     }
 
     @Transactional
-    public void insertExchange(Integer userId, String exchangeMethod, String walletAddr, Double reqAmount, MultipartFile identifyCard,MultipartFile profileImage) {
+    public void insertExchange(Integer userId, String walletAddr , String exchangeMethod, Double reqAmount, MultipartFile identifyCard,MultipartFile profileImage) {
 
         User user = userRepository.findById(userId).get();
         user.setTotalTg(user.getTotalTg() - reqAmount);

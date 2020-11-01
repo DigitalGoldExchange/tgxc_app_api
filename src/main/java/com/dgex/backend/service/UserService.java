@@ -324,7 +324,7 @@ public class UserService {
     @Transactional
     public Object findByUserInfo(Integer userId) {
         User user = userRepository.findById(userId).get();
-        List<Exchange> exchangeList = exchangeRepository.findByDeleteDatetimeIsNullAndUser(user);
+        List<Exchange> exchangeList = exchangeRepository.findByDeleteDatetimeIsNullAndUserOrderByCreateDatetimeDesc(user);
         Integer unreadPushCount = pushInfoRepository.countByDeleteDatetimeIsNullAndUserAndReadYn(user, "N");
         Map<String, Object> result = new HashMap<>();
 
@@ -435,7 +435,7 @@ public class UserService {
             user.setUpdateDatetime(new Date());
             userRepository.save(user);
 
-            List<Exchange> exchangeList = exchangeRepository.findByDeleteDatetimeIsNullAndUser(user);
+            List<Exchange> exchangeList = exchangeRepository.findByDeleteDatetimeIsNullAndUserOrderByCreateDatetimeDesc(user);
 
             BCryptPasswordEncoder pe = new BCryptPasswordEncoder();
             if(pe.matches(password, user.getPassword())){

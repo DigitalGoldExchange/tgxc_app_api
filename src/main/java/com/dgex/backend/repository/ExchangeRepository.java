@@ -15,11 +15,11 @@ public interface ExchangeRepository extends JpaRepository<Exchange, Integer> {
 
     Page<Exchange> findByDeleteDatetimeIsNull(Pageable pageable);
 
-    List<Exchange> findByDeleteDatetimeIsNullAndUser(User user);
+    List<Exchange> findByDeleteDatetimeIsNullAndUserOrderByCreateDatetimeDesc(User user);
 
     Exchange findByDeleteDatetimeIsNullAndTxIdAndAmount(String txId, Double amount);
 
-    List<Exchange> findByDeleteDatetimeIsNullAndUserAndTradeType(User user, String type);
+    List<Exchange> findByDeleteDatetimeIsNullAndUserAndTradeTypeOrderByCreateDatetimeDesc(User user, String type);
 
 
     @Query("select ex FROM Exchange ex where ex.deleteDatetime is null and ex.user.emailId like :searchWord")
@@ -33,4 +33,22 @@ public interface ExchangeRepository extends JpaRepository<Exchange, Integer> {
 
     @Query("select ex FROM Exchange ex where ex.deleteDatetime is null and ex.status like :searchWord")
     Page<Exchange> findByStatusAndDeleteDatetimeIsNull(@Param("searchWord") String searchWord, Pageable pageable);
+
+
+    @Query("select ex FROM Exchange ex where ex.deleteDatetime is null and ex.tradeType =:type and ex.user.emailId like :searchWord")
+    Page<Exchange> findByEmailIdAndDeleteDatetimeIsNullAndTradeType(@Param("searchWord") String searchWord, String type, Pageable pageable);
+
+    @Query("select ex FROM Exchange ex where ex.deleteDatetime is null and ex.tradeType =:type and ex.user.name like :searchWord")
+    Page<Exchange> findByNameAndDeleteDatetimeIsNullAndTradeType(@Param("searchWord") String searchWord,String type, Pageable pageable);
+
+    @Query("select ex FROM Exchange ex where ex.deleteDatetime is null and ex.tradeType =:type and ex.reqNumber like :searchWord")
+    Page<Exchange> findByReqNumberAndDeleteDatetimeIsNullAndTradeType(@Param("searchWord") String searchWord, String type,Pageable pageable);
+
+    @Query("select ex FROM Exchange ex where ex.deleteDatetime is null and ex.tradeType =:type and ex.status like :searchWord")
+    Page<Exchange> findByStatusAndDeleteDatetimeIsNullAndTradeType(@Param("searchWord") String searchWord,String type, Pageable pageable);
+
+    Page<Exchange> findByDeleteDatetimeIsNullAndTradeType(String type,Pageable pageable);
+
+    @Query("select ex FROM Exchange ex where ex.deleteDatetime is null and ex.tradeType =:type ")
+    List<Exchange> findByDeleteDatetimeIsNullDeposit(String type);
 }
