@@ -49,6 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/auth/**"
                         , "/swagger-ui.html"
                         , "/login"
+                        ,"/uploads/**"
                 ).permitAll();
 //                .antMatchers("/**").hasAnyRole("ADMIN");
 
