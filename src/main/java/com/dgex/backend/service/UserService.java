@@ -325,10 +325,12 @@ public class UserService {
     public Object findByUserInfo(Integer userId) {
         User user = userRepository.findById(userId).get();
         List<Exchange> exchangeList = exchangeRepository.findByDeleteDatetimeIsNullAndUserOrderByCreateDatetimeDesc(user);
+        UserPassportImage userPassportImage = userPassportImageRepository.findByDeleteDatetimeIsNullAndUser(user);
         Integer unreadPushCount = pushInfoRepository.countByDeleteDatetimeIsNullAndUserAndReadYn(user, "N");
         Map<String, Object> result = new HashMap<>();
 
         result.put("exchangeList", exchangeList);
+        result.put("userPassportImage", userPassportImage);
         result.put("user",user);
         if(unreadPushCount > 0 ){
             result.put("unreadPushCount", true);

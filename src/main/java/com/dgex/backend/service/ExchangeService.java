@@ -2,9 +2,11 @@ package com.dgex.backend.service;
 
 import com.dgex.backend.config.JwtTokenProvider;
 import com.dgex.backend.entity.Exchange;
+import com.dgex.backend.entity.ExchangeStore;
 import com.dgex.backend.entity.User;
 import com.dgex.backend.entity.UserExchangeImage;
 import com.dgex.backend.repository.ExchangeRepository;
+import com.dgex.backend.repository.ExchangeStoreRepository;
 import com.dgex.backend.repository.UserExchangeImageRepository;
 import com.dgex.backend.repository.UserRepository;
 import com.dgex.backend.service.common.FileManageService;
@@ -28,6 +30,7 @@ public class ExchangeService {
     private final FileManageService fileManageService;
     private final UserExchangeImageRepository userExchangeImageRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final ExchangeStoreRepository exchangeStoreRepository;
 
     @Transactional
     public Object getList(Integer page, Integer searchKey,  String searchWord) {
@@ -198,20 +201,23 @@ public class ExchangeService {
     }
 
     @Transactional
-    public void insertExchange(Integer userId, String walletAddr , String exchangeMethod, Double reqAmount, MultipartFile identifyCard,MultipartFile profileImage) {
+    public void insertExchange(Integer userId, String walletAddr , String exchangeMethod, Double reqAmount, MultipartFile identifyCard,MultipartFile profileImage, Integer exchangeStoreId) {
 
         User user = userRepository.findById(userId).get();
+        ExchangeStore exchangeStore = exchangeStoreRepository.findById(exchangeStoreId).get();
+
         user.setTotalTg(user.getTotalTg() - reqAmount);
         userRepository.save(user);
 
         Exchange exchange = new Exchange();
         exchange.setCreateDatetime(new Date());
         exchange.setTradeType("EXCHANGE");
-        exchange.setWalletAddr(walletAddr);
+        exchange.setWalletAddr(exchangeStore.getStoreName());
         exchange.setAmount(reqAmount);
         exchange.setStatus("신청");
         exchange.setUser(user);
         exchange.setExchangeMethod(exchangeMethod);
+        exchange.setExchangeStore(exchangeStore);
         Exchange newEx = exchangeRepository.save(exchange);
 
         if(profileImage != null && identifyCard != null){

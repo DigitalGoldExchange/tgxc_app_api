@@ -103,14 +103,15 @@ public class ExchangeController {
     @PostMapping(value = "/insertExchange")
     public CommonResult insertExchange(
             @RequestParam(value = "userId") Integer userId,
-            @RequestParam(value = "walletAddr") String walletAddr,
+            @RequestParam(value = "walletAddr", required = false) String walletAddr,
             @RequestParam(value = "exchangeMethod") String exchangeMethod,
             @RequestParam(value = "reqAmount") Double reqAmount,
             @RequestParam(value = "identifyCard") MultipartFile identifyCard,
-            @RequestParam(value = "profileImage") MultipartFile profileImage
+            @RequestParam(value = "profileImage") MultipartFile profileImage,
+            @RequestParam(value = "exchangeStoreId") Integer exchangeStoreId
 
     ) {
-        exchangeService.insertExchange(userId, walletAddr,exchangeMethod, reqAmount, identifyCard, profileImage );
+        exchangeService.insertExchange(userId, walletAddr,exchangeMethod, reqAmount, identifyCard, profileImage, exchangeStoreId );
         return responseService.getSuccessResult();
     }
 }

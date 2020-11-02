@@ -26,6 +26,11 @@ public class Exchange {
     @JoinColumn(name = "userId")
     private User user;
 
+    //회원
+    @ManyToOne
+    @JoinColumn(name = "exchangeStoreId")
+    private ExchangeStore exchangeStore;
+
     //신청번호
     @Column
     private String reqNumber;
