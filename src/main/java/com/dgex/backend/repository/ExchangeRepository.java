@@ -17,7 +17,7 @@ public interface ExchangeRepository extends JpaRepository<Exchange, Integer> {
 
     List<Exchange> findByDeleteDatetimeIsNullAndUserOrderByCreateDatetimeDesc(User user);
 
-    Exchange findByDeleteDatetimeIsNullAndTxIdAndAmount(String txId, Double amount);
+    Exchange findByDeleteDatetimeIsNullAndTxId(String txId);
 
     List<Exchange> findByDeleteDatetimeIsNullAndUserAndTradeTypeOrderByCreateDatetimeDesc(User user, String type);
 

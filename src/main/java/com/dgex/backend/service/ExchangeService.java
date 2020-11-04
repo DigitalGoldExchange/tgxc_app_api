@@ -237,27 +237,42 @@ public class ExchangeService {
     public Map<String,Object> insertBook(String identifyNumber, String txId,Double amount,String txidTime, String token ) throws SignatureException
         {
         Map<String,Object> result = new HashMap<>();
+
+        Exchange oldExchange = exchangeRepository.findByDeleteDatetimeIsNullAndTxId(txId);
+
         User user = userRepository.findByDeleteDatetimeIsNullAndIdentifyNumber(identifyNumber);
 
         try{
             if(token != null && jwtTokenProvider.validateToken(token)){
-                if(user == null){
-                    result.put("code", "0001");
-                    result.put("msg", "등록된 회원이 없거나 탈퇴한 회원입니다.");
+
+                if(oldExchange == null){
+                    if(user == null){
+                        result.put("code", "0001");
+                        result.put("result", false);
+                        result.put("msg", "등록된 회원이 없거나 탈퇴한 회원입니다.");
+                    }else{
+                        Exchange exchange = new Exchange();
+                        exchange.setUser(user);
+                        exchange.setAmount(amount);
+                        exchange.setCreateDatetime(new Date());
+                        exchange.setTxId(txId);
+                        exchange.setTxIdDatetime(txidTime);
+                        exchange.setTradeType("IN");
+
+                        exchangeRepository.save(exchange);
+
+                        result.put("code", "0000");
+                        result.put("result", true);
+                        result.put("msg", "정상적으로 등록되었습니다.");
+                    }
                 }else{
-                    Exchange exchange = new Exchange();
-                    exchange.setUser(user);
-                    exchange.setAmount(amount);
-                    exchange.setCreateDatetime(new Date());
-                    exchange.setTxId(txId);
-                    exchange.setTxIdDatetime(txidTime);
-                    exchange.setTradeType("IN");
-
-                    exchangeRepository.save(exchange);
-
-                    result.put("code", "0000");
-                    result.put("msg", "정상적으로 등록되었습니다.");
+                    result.put("code", "0001");
+                    result.put("result", false);
+                    result.put("msg", "TXID가 이미 존재합니다.");
                 }
+
+
+
             }else{
                 result.put("result", false);
                 result.put("msg", "토큰이 유효하지 않습니다.");
@@ -277,8 +292,8 @@ public class ExchangeService {
     }
 
     @Transactional
-    public Object checkBook(String txId, Double amount,String token) throws SignatureException{
-        Exchange exchange = exchangeRepository.findByDeleteDatetimeIsNullAndTxIdAndAmount(txId, amount);
+    public Object checkBook(String txId, String token) throws SignatureException{
+        Exchange exchange = exchangeRepository.findByDeleteDatetimeIsNullAndTxId(txId);
         Map<String, Object> result = new HashMap<>();
 
         try{

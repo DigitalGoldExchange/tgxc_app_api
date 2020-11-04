@@ -65,10 +65,9 @@ public class ApiController {
     @GetMapping(value = "/checkBook")
     public SingleResult<Object> checkBook(
             @RequestParam(value = "txid") String txId,
-            @RequestParam(value = "amount") Double amount,
             @RequestHeader(value = "token") String token
     ) throws SignatureException {
-        return responseService.getSingleResult(exchangeService.checkBook(txId, amount, token));
+        return responseService.getSingleResult(exchangeService.checkBook(txId, token));
     }
 
 
