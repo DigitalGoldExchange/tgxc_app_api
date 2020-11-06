@@ -1,8 +1,10 @@
 package com.dgex.backend.service;
 
+import com.dgex.backend.entity.DepositAccount;
 import com.dgex.backend.entity.ExchangeMethod;
 import com.dgex.backend.entity.ExchangeRate;
 import com.dgex.backend.entity.ExchangeStore;
+import com.dgex.backend.repository.DepositAccountRepository;
 import com.dgex.backend.repository.ExchangeMethodRepository;
 import com.dgex.backend.repository.ExchangeRateRepository;
 import com.dgex.backend.repository.ExchangeStoreRepository;
@@ -22,6 +24,7 @@ public class ExchangeRateService {
     private final ExchangeRateRepository exchangeRateRepository;
     private final ExchangeMethodRepository exchangeMethodRepository;
     private final ExchangeStoreRepository exchangeStoreRepository;
+    private final DepositAccountRepository depositAccountRepository;
 
     @Transactional
     public void insert(Double exchangeRate){
@@ -48,11 +51,13 @@ public class ExchangeRateService {
         ExchangeMethod exchangeMethod = exchangeMethodRepository.findByDeleteDatetimeIsNull();
         List<ExchangeStore> inactiveStoreList = exchangeStoreRepository.findByDeleteDatetimeIsNullAndDispYn("N");
         List<ExchangeStore> activeStoreList = exchangeStoreRepository.findByDeleteDatetimeIsNullAndDispYn("Y");
+        DepositAccount depositAccount = depositAccountRepository.findByDeleteDatetimeIsNull();
 
         result.put("activeStoreList", activeStoreList);
         result.put("inactiveStoreList", inactiveStoreList);
         result.put("exchangeRate", exchangeRate);
         result.put("exchangeMethod", exchangeMethod.getName());
+        result.put("depositAccount", depositAccount);
         return result;
     }
 }

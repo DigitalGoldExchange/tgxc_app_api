@@ -2,14 +2,8 @@ package com.dgex.backend.service;
 
 import ch.qos.logback.core.encoder.EchoEncoder;
 import com.dgex.backend.config.JwtTokenProvider;
-import com.dgex.backend.entity.Exchange;
-import com.dgex.backend.entity.PushInfo;
-import com.dgex.backend.entity.User;
-import com.dgex.backend.entity.UserPassportImage;
-import com.dgex.backend.repository.ExchangeRepository;
-import com.dgex.backend.repository.PushInfoRepository;
-import com.dgex.backend.repository.UserPassportImageRepository;
-import com.dgex.backend.repository.UserRepository;
+import com.dgex.backend.entity.*;
+import com.dgex.backend.repository.*;
 import com.dgex.backend.service.common.FileManageService;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +44,7 @@ public class UserService {
     private final UserPassportImageRepository userPassportImageRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PushInfoRepository pushInfoRepository;
+    private final DepositAccountRepository depositAccountRepository;
 
     @Autowired
     private JavaMailSender mailSender;
@@ -341,6 +336,26 @@ public class UserService {
 
         return result;
     }
+
+    @Transactional
+    public Object depositInfo(Integer userId) {
+        User user = userRepository.findById(userId).get();
+        Integer unreadPushCount = pushInfoRepository.countByDeleteDatetimeIsNullAndUserAndReadYn(user, "N");
+        DepositAccount depositAccount = depositAccountRepository.findByDeleteDatetimeIsNull();
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("user",user);
+        result.put("depositAccount",depositAccount);
+        if(unreadPushCount > 0 ){
+            result.put("unreadPushCount", true);
+        }else{
+            result.put("unreadPushCount", false);
+        }
+
+
+        return result;
+    }
+
 
     @Transactional
     public Map<String, Object>  userInfo(String identifyNumber, String token) throws SignatureException {

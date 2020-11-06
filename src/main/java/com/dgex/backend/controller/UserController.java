@@ -167,6 +167,14 @@ public class UserController {
         return responseService.getSingleResult(userService.findByUserInfo(userId));
     }
 
+    @ApiOperation(value = "회원 단건 조회", notes = "회원 pk (userId)를 받아 해당 회원의 정보를 조회한다.")
+    @GetMapping(value = "/depositInfo")
+    public SingleResult<Object> depositInfo(
+            @RequestParam(value = "userId", required = false) Integer userId
+    ) {
+        return responseService.getSingleResult(userService.depositInfo(userId));
+    }
+
     @ApiOperation(value = "회원 비밀번호 체크", notes = "회원 pk (userId)를 받아 해당 회원의 정보를 조회한다.")
     @GetMapping(value = "/findPassword")
     public SingleResult<Object> passwordCheck(
