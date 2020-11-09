@@ -40,16 +40,26 @@ public class ExchangeController {
         return responseService.getSingleResult(exchangeService.getDepositList(page, searchKey, searchWord));
     }
 
+//    @ApiOperation(value = "거래 수정", notes = "거래 정보를 수정한다.")
+//    @PostMapping(value = "/update")
+//    public CommonResult update(
+//            @RequestParam(value = "exchangeId", required = false) Integer exchangeId,
+//            @RequestParam(value = "status", required = false) String status,
+//            @RequestParam(value = "note", required = false) String note
+//    ) {
+//        exchangeService.update(exchangeId, status, note);
+//        return responseService.getSuccessResult();
+//    }
     @ApiOperation(value = "거래 수정", notes = "거래 정보를 수정한다.")
     @PostMapping(value = "/update")
-    public CommonResult update(
+    public SingleResult<Object> update(
             @RequestParam(value = "exchangeId", required = false) Integer exchangeId,
             @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "note", required = false) String note
     ) {
-        exchangeService.update(exchangeId, status, note);
-        return responseService.getSuccessResult();
+        return responseService.getSingleResult(exchangeService.update(exchangeId, status, note));
     }
+
 
     @ApiOperation(value = "거래 수정", notes = "거래 정보를 수정한다.")
     @PostMapping(value = "/depositUpdate")

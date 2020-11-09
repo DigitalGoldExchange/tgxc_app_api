@@ -18,7 +18,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
+import java.security.SecureRandom;
 import java.security.SignatureException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -32,6 +35,16 @@ public class ExchangeService {
     private final JwtTokenProvider jwtTokenProvider;
     private final ExchangeStoreRepository exchangeStoreRepository;
 
+    static SecureRandom rnd = new SecureRandom();
+
+    String randomReqNumber(String key){
+        StringBuilder sb = new StringBuilder(5);
+        for(int i = 0; i < 5; i++){
+            sb.append(key.charAt(rnd.nextInt(5)));
+        }
+        return sb.toString();
+    }
+
     @Transactional
     public Object getList(Integer page, Integer searchKey,  String searchWord) {
         Map<String, Object> result = new HashMap<>();
@@ -44,24 +57,24 @@ public class ExchangeService {
 
         Sort sort = Sort.by(Sort.Direction.DESC,"createDatetime");
         if(searchKey == 1 && searchWord!=null){   //이메일 검색
-            Page<Exchange> pageList = exchangeRepository.findByReqNumberAndDeleteDatetimeIsNull("%"+searchWord+"%", PageRequest.of(page-1,10, sort));
+            Page<Exchange> pageList = exchangeRepository.findByEmailIdAndDeleteDatetimeIsNullAndTradeType("%"+searchWord+"%","EXCHANGE", PageRequest.of(page-1,10, sort));
             list = pageList.toList();
             totalPages = pageList.getTotalPages();
 
         }else if(searchKey == 2 && searchWord!=null){  //이름 검색
-            Page<Exchange> pageList = exchangeRepository.findByEmailIdAndDeleteDatetimeIsNull("%"+searchWord+"%", PageRequest.of(page-1,10, sort));
+            Page<Exchange> pageList = exchangeRepository.findByNameAndDeleteDatetimeIsNullAndTradeType("%"+searchWord+"%","EXCHANGE", PageRequest.of(page-1,10, sort));
             list = pageList.toList();
             totalPages = pageList.getTotalPages();
         }else if(searchKey == 3 && searchWord!=null){ //신청번호 검색
-            Page<Exchange> pageList = exchangeRepository.findByNameAndDeleteDatetimeIsNull("%"+searchWord+"%", PageRequest.of(page-1,10, sort));
+            Page<Exchange> pageList = exchangeRepository.findByReqNumberAndDeleteDatetimeIsNullAndTradeType("%"+searchWord+"%","EXCHANGE", PageRequest.of(page-1,10, sort));
             list = pageList.toList();
             totalPages = pageList.getTotalPages();
         }else if(searchKey == 4 && searchWord!=null){   //진행상황 검색
-            Page<Exchange> pageList = exchangeRepository.findByStatusAndDeleteDatetimeIsNull("%"+searchWord+"%", PageRequest.of(page-1,10, sort));
+            Page<Exchange> pageList = exchangeRepository.findByStatusAndDeleteDatetimeIsNullAndTradeType("%"+searchWord+"%", "EXCHANGE", PageRequest.of(page-1,10, sort));
             list = pageList.toList();
             totalPages = pageList.getTotalPages();
         }else{
-            Page<Exchange> pageList = exchangeRepository.findByDeleteDatetimeIsNull(PageRequest.of(page-1, 10, sort));
+            Page<Exchange> pageList = exchangeRepository.findByDeleteDatetimeIsNullAndTradeType("EXCHANGE",PageRequest.of(page-1, 10, sort));
             list = pageList.toList();
             totalPages = pageList.getTotalPages();
         }
@@ -113,16 +126,33 @@ public class ExchangeService {
     }
 
     @Transactional
-    public void update(Integer exchangeId, String status, String note) {
+    public Object update(Integer exchangeId, String status, String note) {
+        Map<String, Object> result = new HashMap<>();
         Exchange exchange = exchangeRepository.findById(exchangeId).get();
         if(note != null){
             exchange.setNote(note);
         }else{
             exchange.setNote("");
         }
+
+        if("취소".equals(status) || "반려".equals(status)){
+
+            if(exchange.getStatus().equals("취소") || exchange.getStatus().equals("반려")){
+                result.put("result",false);
+                result.put("msg","이미 취소되었습니다.");
+                return result;
+            }else{
+                User user = exchange.getUser();
+                user.setTotalTg(user.getTotalTg()+exchange.getAmount());
+                userRepository.save(user);
+            }
+        }
+
         exchange.setStatus(status);
         exchange.setUpdateDatetime(new Date());
         exchangeRepository.save(exchange);
+        result.put("result",true);
+        return result;
     }
 
     @Transactional
@@ -185,14 +215,24 @@ public class ExchangeService {
 
     @Transactional
     public void insertWithdraw(Integer userId, String walletAddr, Double sendTg) {
-
+        System.out.println("_____________"+sendTg);
+        BigDecimal decimalTg = new BigDecimal(sendTg);
+        System.out.println("_____________"+decimalTg);
         User user = userRepository.findById(userId).get();
         user.setTotalTg(user.getTotalTg() - sendTg);
         userRepository.save(user);
 
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMddHHmmss");
+
+        Date time = new Date();
+        String timeString = dateFormat.format(time);
+
+        String key = timeString + user.getIdentifyNumber();
+
         Exchange exchange = new Exchange();
         exchange.setCreateDatetime(new Date());
         exchange.setTradeType("OUT");
+        exchange.setReqNumber("W"+timeString+randomReqNumber(key));
         exchange.setWalletAddr(walletAddr);
         exchange.setAmount(sendTg);
         exchange.setStatus("신청");
@@ -205,9 +245,15 @@ public class ExchangeService {
 
         User user = userRepository.findById(userId).get();
         ExchangeStore exchangeStore = exchangeStoreRepository.findById(exchangeStoreId).get();
-
         user.setTotalTg(user.getTotalTg() - reqAmount);
         userRepository.save(user);
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMddHHmmss");
+
+        Date time = new Date();
+        String timeString = dateFormat.format(time);
+
+        String key = timeString + user.getIdentifyNumber();
 
         Exchange exchange = new Exchange();
         exchange.setCreateDatetime(new Date());
@@ -215,6 +261,7 @@ public class ExchangeService {
         exchange.setWalletAddr(exchangeStore.getStoreName());
         exchange.setAmount(reqAmount);
         exchange.setStatus("신청");
+        exchange.setReqNumber("E"+timeString+randomReqNumber(key));
         exchange.setUser(user);
         exchange.setExchangeMethod(exchangeMethod);
         exchange.setExchangeStore(exchangeStore);
@@ -230,8 +277,6 @@ public class ExchangeService {
             userExchangeImageRepository.save(userExchangeImage);
         }
     }
-
-
 
     @Transactional
     public Map<String,Object> insertBook(String identifyNumber, String txId,Double amount,String txidTime, String token ) throws SignatureException
@@ -253,7 +298,7 @@ public class ExchangeService {
                     }else{
                         Exchange exchange = new Exchange();
                         exchange.setUser(user);
-                        exchange.setAmount(amount);
+//                        exchange.setAmount(amount);
                         exchange.setCreateDatetime(new Date());
                         exchange.setTxId(txId);
                         exchange.setTxIdDatetime(txidTime);
