@@ -93,7 +93,7 @@ public class UserController {
     @ApiOperation(value = "회원 리스트", notes = "회원 pk (userId)를 역방향(최신순)으로 정렬한 리스트를 조회한다.")
     @GetMapping(value = "/refreshToken")
     public SingleResult<Object> refreshToken(
-            @RequestHeader(value = "token") String token
+            @RequestParam(value = "token") String token
     ) throws SignatureException {
         return responseService.getSingleResult(userService.refreshToken(token));
     }
