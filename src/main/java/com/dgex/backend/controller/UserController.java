@@ -283,7 +283,15 @@ public class UserController {
     }
 
 
-
+    @ApiOperation(value = "푸시타입 수정")
+    @PostMapping(value = "/updatePushType")
+    public CommonResult updatePushType(
+            @RequestParam(value = "userId", required = false) Integer userId,
+            @RequestParam(value = "pushType", required = false) String pushType
+    ) {
+        userService.updatePushType(userId, pushType);
+        return responseService.getSuccessResult();
+    }
 
 
 

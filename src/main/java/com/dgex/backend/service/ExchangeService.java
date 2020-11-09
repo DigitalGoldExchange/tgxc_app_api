@@ -34,6 +34,7 @@ public class ExchangeService {
     private final UserExchangeImageRepository userExchangeImageRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final ExchangeStoreRepository exchangeStoreRepository;
+    private final PushInfoService pushInfoService;
 
     static SecureRandom rnd = new SecureRandom();
 
@@ -129,6 +130,7 @@ public class ExchangeService {
     public Object update(Integer exchangeId, String status, String note) {
         Map<String, Object> result = new HashMap<>();
         Exchange exchange = exchangeRepository.findById(exchangeId).get();
+        User user = exchange.getUser();
         if(note != null){
             exchange.setNote(note);
         }else{
@@ -142,10 +144,54 @@ public class ExchangeService {
                 result.put("msg","이미 취소되었습니다.");
                 return result;
             }else{
-                User user = exchange.getUser();
                 user.setTotalTg(user.getTotalTg()+exchange.getAmount());
                 userRepository.save(user);
             }
+        }
+
+        //최초 신청 날짜
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        String tradeTime = dateFormat.format(exchange.getCreateDatetime());
+        String tradeType = null;
+        String pushStatus = null;
+        if(user.getKoreanYn().equals("Y")){
+            if(exchange.getTradeType().equals("OUT")){
+                tradeType = "출금";
+            }else if(exchange.getTradeType().equals("EXCHANGE")){
+                tradeType = "교환 신청";
+            }
+        }else{
+            if(exchange.getTradeType().equals("OUT")){
+                tradeType = "Withdraw";
+            }else if(exchange.getTradeType().equals("EXCHANGE")){
+                tradeType = "TG Exchange";
+            }
+
+            if(status.equals("완료")){
+                pushStatus = "completed";
+            }else if(status.equals("승인")){
+                pushStatus = "approved";
+            }else if(status.equals("반려")){
+                pushStatus = "rejected";
+            }else if(status.equals("취소")){
+                pushStatus = "cancelled";
+            }
+
+        }
+
+        if("A".equals(user.getPushType()) || "M".equals(user.getPushType()) ){
+            String title = null;
+            String content = null;
+
+            if(user.getKoreanYn().equals("Y")){
+                title = "[알림] "+tradeType+"이 "+status+" 되었습니다.";
+                content = "안녕하세요."+user.getName()+"님, "+tradeTime+"에 신청하신"+exchange.getAmount()+"TG "+tradeType+"이 "+status+"되었습니다.";
+            }else{
+                title = "[Alert] "+tradeType+" Request has been "+pushStatus;
+                content = "Hi "+user.getName()+", You request for "+tradeType+"with "+exchange.getAmount()+ " on "+tradeTime+" has been "+pushStatus+".";
+            }
+
+            pushInfoService.sendPush(user.getUserId(), title, content);
         }
 
         exchange.setStatus(status);
@@ -215,9 +261,6 @@ public class ExchangeService {
 
     @Transactional
     public void insertWithdraw(Integer userId, String walletAddr, Double sendTg) {
-        System.out.println("_____________"+sendTg);
-        BigDecimal decimalTg = new BigDecimal(sendTg);
-        System.out.println("_____________"+decimalTg);
         User user = userRepository.findById(userId).get();
         user.setTotalTg(user.getTotalTg() - sendTg);
         userRepository.save(user);
@@ -296,9 +339,10 @@ public class ExchangeService {
                         result.put("result", false);
                         result.put("msg", "등록된 회원이 없거나 탈퇴한 회원입니다.");
                     }else{
+
                         Exchange exchange = new Exchange();
                         exchange.setUser(user);
-//                        exchange.setAmount(amount);
+                        exchange.setAmount(amount);
                         exchange.setCreateDatetime(new Date());
                         exchange.setTxId(txId);
                         exchange.setTxIdDatetime(txidTime);
@@ -306,9 +350,28 @@ public class ExchangeService {
 
                         exchangeRepository.save(exchange);
 
+                        user.setTotalTg(user.getTotalTg() + amount);
+                        userRepository.save(user);
+
                         result.put("code", "0000");
                         result.put("result", true);
                         result.put("msg", "정상적으로 등록되었습니다.");
+
+                        if("A".equals(user.getPushType()) || "M".equals(user.getPushType()) ){
+                            String title = null;
+                            String content = null;
+
+                            if(user.getKoreanYn().equals("Y")){
+                                title = "[알림] "+amount+"TG 입금이 완료 되었습니다.";
+                                content = "안녕하세요."+user.getName()+"님, "+amount+"TG 입금이 완료 되었습니다.";
+                            }else{
+                                title = "[Alert] "+amount+"TG has been deposited";
+                                content = "Hi "+user.getName()+", "+amount+"TG has been deposited on your account";
+                            }
+
+                            pushInfoService.sendPush(user.getUserId(), title, content);
+                        }
+
                     }
                 }else{
                     result.put("code", "0001");

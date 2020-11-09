@@ -161,6 +161,7 @@ public class UserService {
             user.setLevel("USER");
             user.setTotalTg(0.0);
             user.setStatus(0);
+            user.setPushType("A");
             user.setDeviceToken(user.getDeviceToken());
             user.setSignKey(newPw);
             User newUser = userRepository.save(user);
@@ -201,6 +202,7 @@ public class UserService {
             user.setLevel("MANAGE");
             user.setMenuLevel(menuLevel);
             user.setTotalTg(0.0);
+            user.setPushType("A");
             userRepository.save(user);
             result.put("code","0001");
             return result;
@@ -698,6 +700,15 @@ public class UserService {
 //        }
 
         return false;
+    }
+
+
+    @Transactional
+    public void updatePushType(Integer userId, String pushType){
+        User user = userRepository.findById(userId).get();
+
+        user.setPushType(pushType);
+        userRepository.save(user);
     }
 
 

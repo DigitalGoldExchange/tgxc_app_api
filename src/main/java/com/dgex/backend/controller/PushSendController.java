@@ -39,4 +39,15 @@ public class PushSendController {
     ) {
         return responseService.getSingleResult(pushInfoService.userPushList(userId));
     }
+
+    @ApiOperation(value = "거래 수정", notes = "거래 정보를 수정한다.")
+    @PostMapping(value = "/updatePushRead")
+    public CommonResult updatePushRead(
+            @RequestParam(value = "pushInfoId", required = false) Integer pushInfoId
+    ) {
+        pushInfoService.updatePushRead(pushInfoId);
+        return responseService.getSuccessResult();
+    }
+
+
 }

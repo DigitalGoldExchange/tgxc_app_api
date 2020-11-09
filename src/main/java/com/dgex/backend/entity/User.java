@@ -98,6 +98,10 @@ public class User {
     @Column
     private String deviceType;
 
+    //푸시(A:모두, M:중요, D:거부
+    @Column
+    private String pushType;
+
     @Column
     private Double totalTg;
 

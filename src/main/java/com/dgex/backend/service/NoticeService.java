@@ -7,6 +7,7 @@ import com.dgex.backend.entity.User;
 import com.dgex.backend.repository.NoticeEngRepository;
 import com.dgex.backend.repository.NoticeKrRepository;
 import com.dgex.backend.repository.NoticeRepository;
+import com.dgex.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +27,8 @@ public class NoticeService {
     private final NoticeKrRepository noticeKrRepository;
     private final NoticeEngRepository noticeEngRepository;
     private final NoticeRepository noticeRepository;
+    private final UserRepository userRepository;
+    private final PushInfoService pushInfoService;
 
     @Transactional
     public void insert(String title, String contents, String koreanYn){
@@ -41,6 +44,17 @@ public class NoticeService {
         }
 
         noticeRepository.save(notice);
+
+        List<User> koreanUser = userRepository.findByDeleteDatetimeIsNullAndKoreanYnIsAndPushTypeIs("Y","A");
+        List<User> foreignerUser = userRepository.findByDeleteDatetimeIsNullAndKoreanYnIsAndPushTypeIs("N","A");
+
+        if("Y".equals(koreanYn) || koreanYn == null){
+            pushInfoService.sendAllPush(koreanUser, title, contents);
+        }else{
+            pushInfoService.sendAllPush(foreignerUser, title, contents);
+        }
+
+
 
     }
 
