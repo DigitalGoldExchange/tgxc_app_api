@@ -1,5 +1,9 @@
 package com.dgex.backend.config;
 
+import freemarker.template.TemplateModel;
+import kr.pe.kwonnam.freemarker.inheritance.BlockDirective;
+import kr.pe.kwonnam.freemarker.inheritance.ExtendsDirective;
+import kr.pe.kwonnam.freemarker.inheritance.PutDirective;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -12,19 +16,20 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Locale;
+import java.util.*;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
@@ -35,6 +40,45 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations("file:./uploads/");
+    }
+
+    @Bean
+    public Map<String, TemplateModel> freemarkerLayoutDirectives() {
+
+        Map<String, TemplateModel> freemarkerLayoutDirectives = new HashMap<String, TemplateModel>();
+        freemarkerLayoutDirectives.put("extends", new ExtendsDirective());
+        freemarkerLayoutDirectives.put("block", new BlockDirective());
+        freemarkerLayoutDirectives.put("put", new PutDirective());
+        return freemarkerLayoutDirectives;
+    }
+
+    @Bean
+    public FreeMarkerConfigurer freemarkerConfig() {
+
+        FreeMarkerConfigurer freemarkerConfig = new FreeMarkerConfigurer();
+        freemarkerConfig.setTemplateLoaderPath("classpath:/templates");
+        freemarkerConfig.setDefaultEncoding("utf-8");
+
+
+        Map<String, Object> freemarkerVariables = new HashMap<String, Object>();
+        freemarkerVariables.put("layout", freemarkerLayoutDirectives());
+
+
+        freemarkerConfig.setFreemarkerVariables(freemarkerVariables);
+        return freemarkerConfig;
+    }
+
+
+    @Bean
+    public ViewResolver viewResolver() {
+
+        FreeMarkerViewResolver viewResolver = new FreeMarkerViewResolver();
+        viewResolver.setCache(false);
+        viewResolver.setPrefix("");
+        viewResolver.setExposeSpringMacroHelpers(true);
+        viewResolver.setSuffix(".ftl");
+        viewResolver.setContentType("text/html; charset=utf-8");
+        return viewResolver;
     }
 
     @Override
