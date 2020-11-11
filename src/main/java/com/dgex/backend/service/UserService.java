@@ -5,6 +5,8 @@ import com.dgex.backend.config.JwtTokenProvider;
 import com.dgex.backend.entity.*;
 import com.dgex.backend.repository.*;
 import com.dgex.backend.service.common.FileManageService;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.binary.Base32;
@@ -20,6 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.crypto.Mac;
@@ -50,6 +53,9 @@ public class UserService {
     @Autowired
     private JavaMailSender mailSender;
 
+    @Autowired
+    protected Configuration configuration;
+
     static final String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     static final String CD = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     static SecureRandom rnd = new SecureRandom();
@@ -75,23 +81,34 @@ public class UserService {
     }
 
     @Async
-    public Object sendSignKey(String emailId, String signKey){
+    public Object sendSignKey(String emailId,String name, String signKey){
         Map<String, Object> result = new HashMap<>();
 
         MimeMessage msg = mailSender.createMimeMessage();
+        String charset = "UTF-8";
         try{
+            final Map<String, Object> params = new HashMap<>();
+
+            params.put("name", name);
+            params.put("emailId", emailId);
+            params.put("url", "http://117.52.98.39:8093/user/signUpConfirm?email="+emailId+"&authKey="+signKey);
+            Template t = configuration.getTemplate("auth_mail.ftl");
+            final String content = FreeMarkerTemplateUtils.processTemplateIntoString(t, params);
             msg.setSubject("회원가입 이메일 인증 메일입니다.");
-            msg.setText(new StringBuffer().append("<h1>[이메일 인증]</h1>")
-                    .append("<p>아래 링크를 클릭하시면 이메일 인증이 완료됩니다.</p>")
-                    .append("<a href='http://117.52.98.39:8093/user/signUpConfirm?email=")
-                    .append(emailId)
-                    .append("&authKey=")
-                    .append(signKey)
-                    .append("'>이메일 인증 확인</a>")
-                    .toString(),"utf-8","html");
+            msg.setText(content, charset, "html");
+//            msg.setText(new StringBuffer().append("<h1>[이메일 인증]</h1>")
+//                    .append("<p>아래 링크를 클릭하시면 이메일 인증이 완료됩니다.</p>")
+//                    .append("<a href='http://117.52.98.39:8093/user/signUpConfirm?email=")
+//                    .append(emailId)
+//                    .append("&authKey=")
+//                    .append(signKey)
+//                    .append("'>이메일 인증 확인</a>")
+//                    .toString(),"utf-8","html");
             msg.setRecipients(MimeMessage.RecipientType.TO, emailId);
         }catch (MessagingException e){
             result.put("result",false);
+        }catch (Exception e){
+
         }
         try{
             mailSender.send(msg);

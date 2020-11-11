@@ -252,9 +252,10 @@ public class UserController {
     @PostMapping(value = "/sendSignKey")
     public SingleResult<Object> sendSignKey(
             @RequestParam(value = "emailId", required = true) String emailId,
+            @RequestParam(value = "name", required = true) String name,
             @RequestParam(value = "signKey", required = true) String signKey
     ) {
-        return responseService.getSingleResult(userService.sendSignKey(emailId, signKey));
+        return responseService.getSingleResult(userService.sendSignKey(emailId, name, signKey));
     }
 
 
