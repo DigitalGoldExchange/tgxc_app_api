@@ -117,8 +117,10 @@ public class NiceController {
 
     @ApiOperation(value = "본인인증시작")
     @PostMapping(value = "/niceSuccess")
-    public Object niceSuccess(
-            HttpServletRequest request
+    public ModelAndView niceSuccess(
+            HttpServletRequest request,
+            ModelAndView mav
+
     ) throws UnsupportedEncodingException {
         NiceID.Check.CPClient niceCheck = new  NiceID.Check.CPClient();
         Map<String, Object> result = new HashMap<>();
@@ -167,13 +169,6 @@ public class NiceController {
             sMobileNo		= (String)mapresult.get("MOBILE_NO");
             sMobileCo		= (String)mapresult.get("MOBILE_CO");
 
-            String charset[] = {"euc-kr", "UTF-8"};
-
-            for(int i=0; i<charset.length ; i++){
-                System.out.println(charset[i] + " URLEncoder : " + URLEncoder.encode(utf8Name, charset[i]));
-                System.out.println(charset[i] + " URLDecoder : " + URLDecoder.decode(utf8Name, charset[i]));
-            }
-
             result.put("name",sName);
             result.put("utf8name",utf8Name);
             result.put("birthDate",sBirthDate);
@@ -220,7 +215,9 @@ public class NiceController {
 //            sMessage = "알수 없는 에러 입니다. iReturn : " + iReturn;
 //        }
 
-        return result;
+        mav.addObject("result",result);
+        mav.setViewName("checkplus_success");
+        return mav;
 
     }
 

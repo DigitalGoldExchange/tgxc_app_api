@@ -7,7 +7,7 @@
     <meta http-Equiv="Expires" Content="0" />
 </head>
 <body onload="goNice()">
-<form name="form_chk" method="post">
+<form name="form_chk" method="post" accept-charset="EUC-KR">
     <input type="hidden" name="m" value="checkplusService">
     <input type="hidden" name="EncodeData" value="${sEncData!}">
 </form>
