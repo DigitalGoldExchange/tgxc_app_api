@@ -173,7 +173,7 @@ public class NiceController {
             result.put("utf8name",utf8Name);
             result.put("birthDate",sBirthDate);
             result.put("mobileNo",sMobileNo);
-            result.put("result",true);
+            result.put("result","성공");
 
             String session_sRequestNumber = (String)request.getAttribute("REQ_SEQ");
             if(!sRequestNumber.equals(session_sRequestNumber))
@@ -183,7 +183,7 @@ public class NiceController {
                 sAuthType = "";
             }
         }else{
-            result.put("result",false);
+            result.put("result","실패");
             result.put("msg","본인인증에 실패했습니다.");
         }
 //        else if( iReturn == -1)

@@ -8,7 +8,7 @@
 <script type="text/javascript">
 
     function setSubmitMessage() {
-        window.postMessage('${result.result}|${result.name!}|${result.utf8name!}|${result.birthDate!}|${result.mobileNo!}','*');
+        window.postMessage('<#if result.result??>${result.result}</#if>|<#if result.name??>${result.name}</#if>|<#if result.utf8name??>${result.utf8name}</#if>|<#if result.birthDate??>${result.birthDate}</#if>|<#if result.mobileNo??>${result.mobileNo}</#if>','*');
     }
 
 </script>
