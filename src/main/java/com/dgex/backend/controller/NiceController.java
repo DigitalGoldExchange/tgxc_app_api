@@ -65,10 +65,10 @@ public class NiceController {
 
 // CheckPlus(본인인증) 처리 후, 결과 데이타를 리턴 받기위해 다음예제와 같이 http부터 입력합니다.
 //리턴url은 인증 전 인증페이지를 호출하기 전 url과 동일해야 합니다. ex) 인증 전 url : http://www.~ 리턴 url : http://www.~
-//        String sReturnUrl = "http://localhost:8093/nice/niceSuccess";      // 성공시 이동될 URL
-//        String sErrorUrl = "http://localhost:8093/nice/niceFail";         // 실패시 이동될 URL
-        String sReturnUrl = "http://117.52.98.39:8093/nice/niceSuccess";      // 성공시 이동될 URL
-        String sErrorUrl = "http://117.52.98.39:8093/nice/niceFail";         // 실패시 이동될 URL
+        String sReturnUrl = "http://localhost:8093/nice/niceSuccess";      // 성공시 이동될 URL
+        String sErrorUrl = "http://localhost:8093/nice/niceFail";         // 실패시 이동될 URL
+//        String sReturnUrl = "http://117.52.98.39:8093/nice/niceSuccess";      // 성공시 이동될 URL
+//        String sErrorUrl = "http://117.52.98.39:8093/nice/niceFail";         // 실패시 이동될 URL
 
 
 // 입력될 plain 데이타를 만든다.
@@ -167,15 +167,12 @@ public class NiceController {
             sMobileNo		= (String)mapresult.get("MOBILE_NO");
             sMobileCo		= (String)mapresult.get("MOBILE_CO");
 
-            String charset[] = {"euc-kr", "ksc5601", "iso-8859-1", "8859_1", "ascii", "UTF-8"};
+            String charset[] = {"euc-kr", "UTF-8"};
 
             for(int i=0; i<charset.length ; i++){
                 System.out.println(charset[i] + " URLEncoder : " + URLEncoder.encode(utf8Name, charset[i]));
                 System.out.println(charset[i] + " URLDecoder : " + URLDecoder.decode(utf8Name, charset[i]));
             }
-
-
-            출처: https://cofs.tistory.com/5 [CofS]
 
             result.put("name",sName);
             result.put("utf8name",utf8Name);
