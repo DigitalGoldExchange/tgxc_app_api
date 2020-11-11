@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ko">
 <head>
-    <meta charset="utf-8">
+    <meta charset="euc-kr">
     <meta http-Equiv="Cache-Control" Content="no-cache" />
     <meta http-Equiv="Pragma" Content="no-cache" />
     <meta http-Equiv="Expires" Content="0" />
