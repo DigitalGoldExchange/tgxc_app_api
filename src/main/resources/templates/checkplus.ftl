@@ -1,13 +1,13 @@
 <!doctype html>
 <html lang="ko">
 <head>
-    <meta charset="euc-kr">
+    <meta charset="utf-8">
     <meta http-Equiv="Cache-Control" Content="no-cache" />
     <meta http-Equiv="Pragma" Content="no-cache" />
     <meta http-Equiv="Expires" Content="0" />
 </head>
 <body onload="goNice()">
-<form name="form_chk" method="post" accept-charset="EUC-KR">
+<form name="form_chk" method="post">
     <input type="hidden" name="m" value="checkplusService">
     <input type="hidden" name="EncodeData" value="${sEncData!}">
 </form>

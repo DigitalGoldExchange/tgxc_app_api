@@ -118,14 +118,14 @@ public class NiceController {
     @ApiOperation(value = "본인인증시작")
     @PostMapping(value = "/niceSuccess")
     public ModelAndView niceSuccess(
-            HttpServletRequest request,
+            @RequestParam(value="EncodeData") String EncodeData,
             ModelAndView mav
 
-    ) throws UnsupportedEncodingException {
+    )   {
         NiceID.Check.CPClient niceCheck = new  NiceID.Check.CPClient();
         Map<String, Object> result = new HashMap<>();
 
-        String sEncodeData = requestReplace(request.getParameter("EncodeData"), "encodeData");
+        String sEncodeData = requestReplace(EncodeData, "encodeData");
 
         String sSiteCode = "BT052";				// NICE로부터 부여받은 사이트 코드
         String sSitePassword = "I9fpP2tGg3Ep";			// NICE로부터 부여받은 사이트 패스워드
@@ -169,53 +169,26 @@ public class NiceController {
             sMobileNo		= (String)mapresult.get("MOBILE_NO");
             sMobileCo		= (String)mapresult.get("MOBILE_CO");
 
-            result.put("name",sName);
-            result.put("utf8name",utf8Name);
-            result.put("birthDate",sBirthDate);
-            result.put("mobileNo",sMobileNo);
-            result.put("result","성공");
+            mav.addObject("result","success");
+            mav.addObject("sMobileNo",sMobileNo);
+            mav.addObject("sName",sName);
+            mav.addObject("sBirthDate",sBirthDate);
+//            result.put("result","success");
+//            result.put("sMobileNo","sMobileNo");
+//            result.put("sName","sName");
+//            result.put("sBirthDate","sBirthDate");
 
-            String session_sRequestNumber = (String)request.getAttribute("REQ_SEQ");
-            if(!sRequestNumber.equals(session_sRequestNumber))
-            {
-                sMessage = "세션값 불일치 오류입니다.";
-                sResponseNumber = "";
-                sAuthType = "";
-            }
         }else{
-            result.put("result","실패");
-            result.put("msg","본인인증에 실패했습니다.");
+            mav.addObject("result","fail");
+            mav.addObject("sMobileNo","");
+            mav.addObject("sName","");
+            mav.addObject("sBirthDate","");
+//            result.put("result","fail");
+//            result.put("sMobileNo","");
+//            result.put("sName","");
+//            result.put("sBirthDate","");
         }
-//        else if( iReturn == -1)
-//        {
-//            sMessage = "복호화 시스템 오류입니다.";
-//        }
-//        else if( iReturn == -4)
-//        {
-//            sMessage = "복호화 처리 오류입니다.";
-//        }
-//        else if( iReturn == -5)
-//        {
-//            sMessage = "복호화 해쉬 오류입니다.";
-//        }
-//        else if( iReturn == -6)
-//        {
-//            sMessage = "복호화 데이터 오류입니다.";
-//        }
-//        else if( iReturn == -9)
-//        {
-//            sMessage = "입력 데이터 오류입니다.";
-//        }
-//        else if( iReturn == -12)
-//        {
-//            sMessage = "사이트 패스워드 오류입니다.";
-//        }
-//        else
-//        {
-//            sMessage = "알수 없는 에러 입니다. iReturn : " + iReturn;
-//        }
-
-        mav.addObject("result",result);
+//        mav.addObject("result",result);
         mav.setViewName("checkplus_success");
         return mav;
 
