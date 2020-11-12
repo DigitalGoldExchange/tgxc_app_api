@@ -67,6 +67,8 @@ public class NiceController {
 //리턴url은 인증 전 인증페이지를 호출하기 전 url과 동일해야 합니다. ex) 인증 전 url : http://www.~ 리턴 url : http://www.~
 //        String sReturnUrl = "http://localhost:8093/nice/niceSuccess";      // 성공시 이동될 URL
 //        String sErrorUrl = "http://localhost:8093/nice/niceFail";         // 실패시 이동될 URL
+//        String sReturnUrl = "http://10.0.2.2:8093/nice/niceSuccess";      // 성공시 이동될 URL
+//        String sErrorUrl = "http://10.0.2.2:8093/nice/niceFail";         // 실패시 이동될 URL
         String sReturnUrl = "http://117.52.98.39:8093/nice/niceSuccess";      // 성공시 이동될 URL
         String sErrorUrl = "http://117.52.98.39:8093/nice/niceFail";         // 실패시 이동될 URL
 

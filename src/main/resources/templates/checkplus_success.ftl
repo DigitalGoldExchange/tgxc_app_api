@@ -9,7 +9,7 @@
 
     function setSubmitMessage() {
          <#--window.postMessage('${result!}|${sMobileNo!}|${sName!}|${sBirthDate!}','*');-->
-        window.ReactNativeWebView.postMessage('${result!}|${sMobileNo!}|${sName!}|${sBirthDate!}','*');
+        window.ReactNativeWebView.postMessage('${result!}|${sMobileNo!}|${sName!}|${sBirthDate!}');
     }
 
 </script>
