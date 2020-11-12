@@ -49,7 +49,7 @@ public class ApiController {
     public CommonResult insertBook(
             @RequestParam(value = "userId") String identifyNumber,
             @RequestParam(value = "txid") String txId,
-            @RequestParam(value = "amount") Double amount,
+            @RequestParam(value = "amount") String amount,
             @RequestParam(value = "txidTime") String txidTime,
             @RequestHeader(value = "token") String token
     ) throws SignatureException {

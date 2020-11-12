@@ -176,7 +176,7 @@ public class UserService {
             user.setCreateDatetime(new Date());
             user.setPassword(pe.encode(user.getPassword()));
             user.setLevel("USER");
-            user.setTotalTg(0.0);
+            user.setTotalTg("0");
             user.setStatus(0);
             user.setPushType("A");
             user.setDeviceToken(user.getDeviceToken());
@@ -218,7 +218,7 @@ public class UserService {
             user.setPassword(pe.encode(password));
             user.setLevel("MANAGE");
             user.setMenuLevel(menuLevel);
-            user.setTotalTg(0.0);
+            user.setTotalTg("0");
             user.setPushType("A");
             userRepository.save(user);
             result.put("code","0001");

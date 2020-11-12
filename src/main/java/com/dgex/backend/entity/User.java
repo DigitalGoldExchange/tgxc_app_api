@@ -103,7 +103,7 @@ public class User {
     private String pushType;
 
     @Column
-    private Double totalTg;
+    private String totalTg;
 
     //등록일
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")

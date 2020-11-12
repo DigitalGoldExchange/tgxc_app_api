@@ -21,6 +21,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.security.SignatureException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -130,6 +132,11 @@ public class ExchangeService {
     public Object update(Integer exchangeId, String status, String note) {
         Map<String, Object> result = new HashMap<>();
         Exchange exchange = exchangeRepository.findById(exchangeId).get();
+
+        NumberFormat format = NumberFormat.getInstance();
+        format.setGroupingUsed(false);
+
+
         User user = exchange.getUser();
         if(note != null){
             exchange.setNote(note);
@@ -144,7 +151,8 @@ public class ExchangeService {
                 result.put("msg","이미 취소되었습니다.");
                 return result;
             }else{
-                user.setTotalTg(user.getTotalTg()+exchange.getAmount());
+                String tgResult = format.format(Double.parseDouble(user.getTotalTg())-Double.parseDouble(exchange.getAmount()));
+                user.setTotalTg(tgResult);
                 userRepository.save(user);
             }
         }
@@ -260,9 +268,13 @@ public class ExchangeService {
     }
 
     @Transactional
-    public void insertWithdraw(Integer userId, String walletAddr, Double sendTg) {
+    public void insertWithdraw(Integer userId, String walletAddr, String sendTg) {
         User user = userRepository.findById(userId).get();
-        user.setTotalTg(user.getTotalTg() - sendTg);
+
+        BigDecimal totalTg = new BigDecimal(user.getTotalTg());
+        BigDecimal tg = new BigDecimal(sendTg);
+
+        user.setTotalTg(totalTg.subtract(tg).toString());
         userRepository.save(user);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMddHHmmss");
@@ -284,11 +296,15 @@ public class ExchangeService {
     }
 
     @Transactional
-    public void insertExchange(Integer userId, String walletAddr , String exchangeMethod, Double reqAmount, MultipartFile identifyCard,MultipartFile profileImage, Integer exchangeStoreId) {
+    public void insertExchange(Integer userId, String walletAddr , String exchangeMethod, String reqAmount, MultipartFile identifyCard,MultipartFile profileImage, Integer exchangeStoreId) {
 
         User user = userRepository.findById(userId).get();
         ExchangeStore exchangeStore = exchangeStoreRepository.findById(exchangeStoreId).get();
-        user.setTotalTg(user.getTotalTg() - reqAmount);
+
+        BigDecimal totalTg = new BigDecimal(user.getTotalTg());
+        BigDecimal tg = new BigDecimal(reqAmount);
+
+        user.setTotalTg(totalTg.subtract(tg).toString());
         userRepository.save(user);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMddHHmmss");
@@ -322,7 +338,7 @@ public class ExchangeService {
     }
 
     @Transactional
-    public Map<String,Object> insertBook(String identifyNumber, String txId,Double amount,String txidTime, String token ) throws SignatureException
+    public Map<String,Object> insertBook(String identifyNumber, String txId,String amount,String txidTime, String token ) throws SignatureException
         {
         Map<String,Object> result = new HashMap<>();
 
@@ -350,7 +366,10 @@ public class ExchangeService {
 
                         exchangeRepository.save(exchange);
 
-                        user.setTotalTg(user.getTotalTg() + amount);
+                        BigDecimal totalTg = new BigDecimal(user.getTotalTg());
+                        BigDecimal tg = new BigDecimal(amount);
+
+                        user.setTotalTg(totalTg.add(tg).toString());
                         userRepository.save(user);
 
                         result.put("code", "0000");

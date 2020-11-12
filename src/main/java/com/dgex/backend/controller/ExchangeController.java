@@ -103,7 +103,7 @@ public class ExchangeController {
     public CommonResult insertWithdraw(
             @RequestParam(value = "userId", required = false) Integer userId,
             @RequestParam(value = "walletAddr", required = false) String walletAddr,
-            @RequestParam(value = "sendTg", required = false) Double sendTg
+            @RequestParam(value = "sendTg", required = false) String sendTg
     ) {
         exchangeService.insertWithdraw(userId, walletAddr, sendTg);
         return responseService.getSuccessResult();
@@ -115,7 +115,7 @@ public class ExchangeController {
             @RequestParam(value = "userId") Integer userId,
             @RequestParam(value = "walletAddr", required = false) String walletAddr,
             @RequestParam(value = "exchangeMethod") String exchangeMethod,
-            @RequestParam(value = "reqAmount") Double reqAmount,
+            @RequestParam(value = "reqAmount") String reqAmount,
             @RequestParam(value = "identifyCard") MultipartFile identifyCard,
             @RequestParam(value = "profileImage") MultipartFile profileImage,
             @RequestParam(value = "exchangeStoreId") Integer exchangeStoreId

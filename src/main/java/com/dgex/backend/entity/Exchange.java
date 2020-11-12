@@ -38,7 +38,7 @@ public class Exchange {
 
     //신청수량
     @Column
-    private Double amount;
+    private String amount;
 
     //진행상황
     @Column
