@@ -81,7 +81,7 @@ public class UserService {
     }
 
     @Async
-    public Object sendSignKey(String emailId,String name, String signKey){
+    public Object sendSignKey(String emailId,String name,String isKorea, String signKey){
         Map<String, Object> result = new HashMap<>();
 
         MimeMessage msg = mailSender.createMimeMessage();
@@ -455,6 +455,26 @@ public class UserService {
     }
 
     @Transactional
+    public Object findByPhoneNumber(String phoneNumber) {
+        Map<String, Object> result = new HashMap<>();
+        if(phoneNumber == null || phoneNumber == ""){
+            result.put("result", false);
+        }else{
+            User user = userRepository.findByDeleteDatetimeIsNullAndPhoneNumber(phoneNumber);
+
+            if(user != null){
+                result.put("result", false);
+                result.put("resultMsg","중복");
+                result.put("user",user);
+            }else{
+                result.put("result", true);
+            }
+        }
+
+        return result;
+    }
+
+    @Transactional
     public Object loginCheck(String emailId, String password, String deviceToken, String deviceType, String role) {
         Map<String, Object> result = new HashMap<>();
         User user = null;
@@ -582,6 +602,45 @@ public class UserService {
 
         if(user != null){
 
+            String newPw = randomString(8);
+            BCryptPasswordEncoder pe = new BCryptPasswordEncoder();
+            user.setPassword(pe.encode(newPw));
+            user.setUpdateDatetime(new Date());
+            userRepository.save(user);
+
+            MimeMessage msg = mailSender.createMimeMessage();
+            try{
+                msg.setSubject(user.getName()+"님 비밀번호 찾기 메일입니다.");
+                msg.setText("비밀번호는 "+newPw+" 입니다.");
+                msg.setRecipients(MimeMessage.RecipientType.TO, user.getEmailId());
+            }catch (MessagingException e){
+                result.put("result",false);
+                result.put("msg","메일 전송에 실패했습니다.");
+                e.printStackTrace();
+            }
+            try{
+                mailSender.send(msg);
+                result.put("result",true);
+            }catch (MailException e){
+                e.printStackTrace();
+                result.put("result",false);
+                result.put("msg","메일 전송에 실패했습니다.");
+            }
+
+        }else{
+            result.put("msg","회원 정보를 찾을 수 없습니다.");
+            result.put("result",false);
+        }
+
+        return result;
+    }
+
+    @Async
+    public Object findUserPassword(String emailId, String phoneNumber) {
+        Map<String, Object> result = new HashMap<>();
+
+        User user = userRepository.findByDeleteDatetimeIsNullAndEmailIdAndPhoneNumber(emailId, phoneNumber);
+        if(user != null){
             String newPw = randomString(8);
             BCryptPasswordEncoder pe = new BCryptPasswordEncoder();
             user.setPassword(pe.encode(newPw));

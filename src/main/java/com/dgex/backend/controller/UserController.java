@@ -214,12 +214,29 @@ public class UserController {
         return responseService.getSingleResult(userService.sendEmail(name, emailId));
     }
 
+    @ApiOperation(value = "비밀번호 찾기")
+    @PostMapping(value = "/findUserPassword")
+    public SingleResult<Object> findUserPassword(
+            @RequestParam(value = "emailId", required = false) String emailId,
+            @RequestParam(value = "phoneNumber", required = false) String phoneNumber
+    ) {
+        return responseService.getSingleResult(userService.findUserPassword(emailId, phoneNumber));
+    }
+
     @ApiOperation(value = "회원 단건 조회", notes = "회원 pk (userId)를 받아 해당 회원의 정보를 조회한다.")
     @GetMapping(value = "/findByEmailId")
     public SingleResult<Object> findByEmailId(
             @RequestParam(value = "emailId", required = false) String emailId
     ) {
         return responseService.getSingleResult(userService.findByEmailId(emailId));
+    }
+
+    @ApiOperation(value = "회원 단건 조회", notes = "회원 pk (userId)를 받아 해당 회원의 정보를 조회한다.")
+    @GetMapping(value = "/findByPhoneNumber")
+    public SingleResult<Object> findByPhone(
+            @RequestParam(value = "phoneNumber", required = false) String phoneNumber
+    ) {
+        return responseService.getSingleResult(userService.findByPhoneNumber(phoneNumber));
     }
 
     @ApiOperation(value = "OTP코드")
@@ -253,9 +270,10 @@ public class UserController {
     public SingleResult<Object> sendSignKey(
             @RequestParam(value = "emailId", required = true) String emailId,
             @RequestParam(value = "name", required = true) String name,
+            @RequestParam(value = "isKorea", required = true) String isKorea,
             @RequestParam(value = "signKey", required = true) String signKey
     ) {
-        return responseService.getSingleResult(userService.sendSignKey(emailId, name, signKey));
+        return responseService.getSingleResult(userService.sendSignKey(emailId, name,isKorea, signKey));
     }
 
 

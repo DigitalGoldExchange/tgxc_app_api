@@ -13,6 +13,10 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     User findByDeleteDatetimeIsNullAndEmailId(String emailId);
 
+    User findByDeleteDatetimeIsNullAndPhoneNumber(String phoneNumber);
+
+    User findByDeleteDatetimeIsNullAndEmailIdAndPhoneNumber(String emailId, String phoneNumber);
+
     User findByDeleteDatetimeIsNullAndEmailIdAndLevelIsNot(String emailId, String level);
 
     User findByDeleteDatetimeIsNullAndEmailIdAndSignKey(String emailId, String signKey);
