@@ -89,6 +89,20 @@ public class ExchangeService {
     }
 
     @Transactional
+    public Object getMemberConfirmList(String reqNumber) {
+
+        Exchange exchange = exchangeRepository.findByDeleteDatetimeIsNullAndReqNumber(reqNumber);
+
+        UserExchangeImage userExchangeImages = userExchangeImageRepository.findByDeleteDatetimeIsNullAndExchange(exchange);
+
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("exchangeInfo", exchange);
+        result.put("userExchangeImages", userExchangeImages);
+        return result;
+    }
+
+    @Transactional
     public Object getDepositList(Integer page, Integer searchKey,  String searchWord) {
         Map<String, Object> result = new HashMap<>();
         List<Exchange> list;

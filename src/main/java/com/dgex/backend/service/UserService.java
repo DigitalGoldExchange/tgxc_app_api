@@ -227,6 +227,33 @@ public class UserService {
     }
 
     @Transactional
+    public Map<String,Object> insertMember(String name,String emailId,String password) {
+        Map<String,Object> result = new HashMap<>();
+        if(name=="" || emailId=="" || password==""){
+            result.put("code", "0000");
+            result.put("msg", "필수값 누락으로 회원가입 실패");
+            return result;
+        }else if(userRepository.findByDeleteDatetimeIsNullAndEmailId(emailId)!=null){
+            result.put("code", "0000");
+            result.put("msg", "이미 가입된 이메일입니다");
+            return result;
+        }else{
+            BCryptPasswordEncoder pe = new BCryptPasswordEncoder();
+            User user = new User();
+            user.setName(name);
+            user.setEmailId(emailId);
+            user.setCreateDatetime(new Date());
+            user.setPassword(pe.encode(password));
+            user.setLevel("MEMBER");
+            user.setTotalTg("0");
+            user.setPushType("D");
+            userRepository.save(user);
+            result.put("code","0001");
+            return result;
+        }
+    }
+
+    @Transactional
     public Object getList(Integer page, Integer searchKey,  String searchWord) {
         Map<String, Object> result = new HashMap<>();
         List<User> list;

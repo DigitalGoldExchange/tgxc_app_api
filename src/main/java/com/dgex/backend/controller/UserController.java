@@ -80,6 +80,21 @@ public class UserController {
         }
     }
 
+    @ApiOperation(value = "관리자 등록", notes = "입력한 회원 정보를 등록한다.")
+    @PostMapping(value = "/insertMember")
+    public CommonResult insertMember(
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "emailId", required = false) String emailId,
+            @RequestParam(value = "password", required = false) String password
+    ) {
+        Map<String, Object> result = userService.insertMember(name, emailId, password);
+        if(result.get("code")=="0001"){
+            return responseService.getSuccessResult();
+        }else{
+            return responseService.getFailResult(0000, result.get("msg").toString());
+        }
+    }
+
     @ApiOperation(value = "회원 리스트", notes = "회원 pk (userId)를 역방향(최신순)으로 정렬한 리스트를 조회한다.")
     @GetMapping(value = "/getList")
     public SingleResult<Object> getList(

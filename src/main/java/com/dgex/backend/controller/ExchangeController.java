@@ -31,6 +31,14 @@ public class ExchangeController {
     }
 
     @ApiOperation(value = "거래내역 리스트")
+    @GetMapping(value = "/getMemberConfirmList")
+    public SingleResult<Object> getMemberConfirmList(
+            @RequestParam(value = "reqNumber", required = false) String reqNumber
+    ) {
+        return responseService.getSingleResult(exchangeService.getMemberConfirmList(reqNumber));
+    }
+
+    @ApiOperation(value = "거래내역 리스트")
     @GetMapping(value = "/getDepositList")
     public SingleResult<Object> getDepositList(
             @RequestParam(value = "searchKey", required = false) Integer searchKey,

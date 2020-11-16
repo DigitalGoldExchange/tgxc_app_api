@@ -1,6 +1,7 @@
 package com.dgex.backend.repository;
 
 import com.dgex.backend.entity.Exchange;
+import com.dgex.backend.entity.ExchangeStore;
 import com.dgex.backend.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +20,10 @@ public interface ExchangeRepository extends JpaRepository<Exchange, Integer> {
 
     Exchange findByDeleteDatetimeIsNullAndTxId(String txId);
 
+    Exchange findByDeleteDatetimeIsNullAndReqNumber(String reqNumber);
+
     List<Exchange> findByDeleteDatetimeIsNullAndUserAndTradeTypeOrderByCreateDatetimeDesc(User user, String type);
+
 
 
     @Query("select ex FROM Exchange ex where ex.deleteDatetime is null and ex.user.emailId like :searchWord")
