@@ -25,6 +25,9 @@ public class FileManageService {
     private String uploadDir;
     private Path fileStorageLocation;
 
+    private static final String algorithm="AES";
+    private static final String transformation = algorithm + "/ECB/PKCS5Padding";
+
     public String storeFile(MultipartFile file){
         this.fileStorageLocation = Paths.get("./uploads").toAbsolutePath().normalize();
         try{

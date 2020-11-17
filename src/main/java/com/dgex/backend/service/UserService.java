@@ -49,6 +49,7 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PushInfoRepository pushInfoRepository;
     private final DepositAccountRepository depositAccountRepository;
+    private final ServerManageRepository serverManageRepository;
 
     @Autowired
     private JavaMailSender mailSender;
@@ -520,11 +521,14 @@ public class UserService {
             userRepository.save(user);
 
             List<Exchange> exchangeList = exchangeRepository.findByDeleteDatetimeIsNullAndUserOrderByCreateDatetimeDesc(user);
+            ServerManage serverManage = serverManageRepository.findByDeleteDatetimeIsNull();
+
 
             BCryptPasswordEncoder pe = new BCryptPasswordEncoder();
             if(pe.matches(password, user.getPassword())){
                 result.put("result", true);
                 result.put("user", user);
+                result.put("serverManage",serverManage);
                 result.put("token", jwtTokenProvider.createToken(String.valueOf(user.getUserId())));
                 if(exchangeList != null){
                     result.put("exchangeList", exchangeList);
