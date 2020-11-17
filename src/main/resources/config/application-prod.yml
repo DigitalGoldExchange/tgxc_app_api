@@ -3,7 +3,7 @@ server:
 
 spring:
   profiles:
-  active: dev
+  active: prod
   datasource:
     url: jdbc:mysql://117.52.98.39:3306/dgex?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false
     driver-class-name: com.mysql.jdbc.Driver
