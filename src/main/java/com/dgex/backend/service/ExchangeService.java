@@ -1,14 +1,8 @@
 package com.dgex.backend.service;
 
 import com.dgex.backend.config.JwtTokenProvider;
-import com.dgex.backend.entity.Exchange;
-import com.dgex.backend.entity.ExchangeStore;
-import com.dgex.backend.entity.User;
-import com.dgex.backend.entity.UserExchangeImage;
-import com.dgex.backend.repository.ExchangeRepository;
-import com.dgex.backend.repository.ExchangeStoreRepository;
-import com.dgex.backend.repository.UserExchangeImageRepository;
-import com.dgex.backend.repository.UserRepository;
+import com.dgex.backend.entity.*;
+import com.dgex.backend.repository.*;
 import com.dgex.backend.service.common.FileManageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -37,6 +31,7 @@ public class ExchangeService {
     private final JwtTokenProvider jwtTokenProvider;
     private final ExchangeStoreRepository exchangeStoreRepository;
     private final PushInfoService pushInfoService;
+    private final ExchangeRateRepository exchangeRateRepository;
 
     static SecureRandom rnd = new SecureRandom();
 
@@ -310,7 +305,7 @@ public class ExchangeService {
     }
 
     @Transactional
-    public void insertExchange(Integer userId, String walletAddr , String exchangeMethod, String reqAmount, MultipartFile identifyCard,MultipartFile profileImage, Integer exchangeStoreId) {
+    public void insertExchange(Integer userId, String walletAddr , String exchangeMethod, String reqAmount, MultipartFile identifyCard,MultipartFile profileImage, Integer exchangeStoreId, String reqType,String reqQty) {
 
         User user = userRepository.findById(userId).get();
         ExchangeStore exchangeStore = exchangeStoreRepository.findById(exchangeStoreId).get();
@@ -338,6 +333,8 @@ public class ExchangeService {
         exchange.setUser(user);
         exchange.setExchangeMethod(exchangeMethod);
         exchange.setExchangeStore(exchangeStore);
+        exchange.setReqQty(reqQty);
+        exchange.setReqType(reqType);
         Exchange newEx = exchangeRepository.save(exchange);
 
         if(profileImage != null && identifyCard != null){

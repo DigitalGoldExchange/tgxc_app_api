@@ -27,19 +27,12 @@ public class ExchangeRateService {
     private final DepositAccountRepository depositAccountRepository;
 
     @Transactional
-    public void insert(Double exchangeRate){
-
-        ExchangeRate exrate = exchangeRateRepository.findByDeleteDatetimeIsNull();
-
-        if(exrate != null){
-            exrate.setDeleteDatetime(new Date());
-            exrate.setUpdateDatetime(new Date());
-            exchangeRateRepository.save(exrate);
-        }
+    public void insert(String exchangeRate, String exchangeGram){
 
         ExchangeRate rate = new ExchangeRate();
         rate.setCreateDatetime(new Date());
         rate.setExchangeRate(exchangeRate);
+        rate.setExchangeGram(exchangeGram);
         exchangeRateRepository.save(rate);
     }
 
@@ -47,7 +40,7 @@ public class ExchangeRateService {
     public Object getList(){
         Map<String, Object> result = new HashMap<>();
 
-        ExchangeRate exchangeRate = exchangeRateRepository.findByDeleteDatetimeIsNull();
+        List<ExchangeRate> exchangeRate = exchangeRateRepository.findByDeleteDatetimeIsNull();
         ExchangeMethod exchangeMethod = exchangeMethodRepository.findByDeleteDatetimeIsNull();
         List<ExchangeStore> inactiveStoreList = exchangeStoreRepository.findByDeleteDatetimeIsNullAndDispYn("N");
         List<ExchangeStore> activeStoreList = exchangeStoreRepository.findByDeleteDatetimeIsNullAndDispYn("Y");
@@ -59,5 +52,37 @@ public class ExchangeRateService {
         result.put("exchangeMethod", exchangeMethod.getName());
         result.put("depositAccount", depositAccount);
         return result;
+    }
+
+    @Transactional
+    public Object getOne(Integer exchangeRateId){
+        Map<String, Object> result = new HashMap<>();
+
+        ExchangeRate exchangeRate = exchangeRateRepository.findById(exchangeRateId).get();
+
+        result.put("exchangeRate", exchangeRate);
+        result.put("result", true);
+        return result;
+    }
+
+    @Transactional
+    public void update(Integer exchangeRateId,String exchangeRate, String exchangeGram){
+
+        ExchangeRate rate = exchangeRateRepository.findById(exchangeRateId).get();
+
+        rate.setExchangeRate(exchangeRate);
+        rate.setExchangeGram(exchangeGram);
+        rate.setUpdateDatetime(new Date());
+        exchangeRateRepository.save(rate);
+    }
+
+    @Transactional
+    public void delete(String exchangeRateId) {
+        String[] storeArray = exchangeRateId.split(",");
+        for(int i = 0; i < storeArray.length; i++) {
+            ExchangeRate store = exchangeRateRepository.findById(Integer.parseInt(storeArray[i])).get();
+            store.setDeleteDatetime(new Date());
+            exchangeRateRepository.save(store);
+        }
     }
 }

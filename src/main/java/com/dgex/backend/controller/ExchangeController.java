@@ -126,10 +126,12 @@ public class ExchangeController {
             @RequestParam(value = "reqAmount") String reqAmount,
             @RequestParam(value = "identifyCard") MultipartFile identifyCard,
             @RequestParam(value = "profileImage") MultipartFile profileImage,
-            @RequestParam(value = "exchangeStoreId") Integer exchangeStoreId
+            @RequestParam(value = "exchangeStoreId") Integer exchangeStoreId,
+            @RequestParam(value = "reqType") String reqType,
+            @RequestParam(value = "reqQty") String reqQty
 
     ) {
-        exchangeService.insertExchange(userId, walletAddr,exchangeMethod, reqAmount, identifyCard, profileImage, exchangeStoreId );
+        exchangeService.insertExchange(userId, walletAddr,exchangeMethod, reqAmount, identifyCard, profileImage, exchangeStoreId, reqType, reqQty);
         return responseService.getSuccessResult();
     }
 }

@@ -21,8 +21,11 @@ public class ExchangeRate {
     @Column(nullable = false)
     private Integer exchangeRateId;
 
-    @ApiModelProperty(value = "비율", example = "0.9")
-    private Double exchangeRate;
+    @ApiModelProperty(value = "금액", example = "0.9")
+    private String exchangeRate;
+
+    @ApiModelProperty(value = "종류", example = "0.9")
+    private String exchangeGram;
 
     //등록일
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")

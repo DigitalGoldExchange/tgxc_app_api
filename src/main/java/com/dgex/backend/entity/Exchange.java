@@ -67,6 +67,13 @@ public class Exchange {
     @Column
     private String exchangeMethod;
 
+    @Column
+    private String reqQty;
+
+    @Column
+    private String reqType;
+
+
     //등록일
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
     @Column
