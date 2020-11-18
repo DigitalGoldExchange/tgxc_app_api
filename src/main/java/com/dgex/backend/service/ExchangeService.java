@@ -160,7 +160,7 @@ public class ExchangeService {
                 result.put("msg","이미 취소되었습니다.");
                 return result;
             }else{
-                String tgResult = format.format(Double.parseDouble(user.getTotalTg())-Double.parseDouble(exchange.getAmount()));
+                String tgResult = format.format(Double.parseDouble(user.getTotalTg())+Double.parseDouble(exchange.getAmount()));
                 user.setTotalTg(tgResult);
                 userRepository.save(user);
             }
