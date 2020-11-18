@@ -3,8 +3,12 @@ package com.dgex.backend.service;
 import com.dgex.backend.response.CommonResult;
 import com.dgex.backend.response.ListResult;
 import com.dgex.backend.response.SingleResult;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 @Service
@@ -35,6 +39,15 @@ public class ResponseService {
         result.setData(data);
         setSuccessResult(result);
         return result;
+    }
+
+    public ResponseEntity<InputStreamResource> getBinaryResult(ByteArrayInputStream in, String fileName){
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", String.format("attachment; filename=%s",fileName));
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .body(new InputStreamResource(in));
     }
 
     // 다중건 결과를 처리하는 메소드
