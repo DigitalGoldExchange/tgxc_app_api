@@ -143,8 +143,6 @@ public class ExchangeService {
         Exchange exchange = exchangeRepository.findById(exchangeId).get();
 
 
-
-
         User user = exchange.getUser();
         if(note != null){
             exchange.setNote(note);
@@ -162,7 +160,6 @@ public class ExchangeService {
 
                 BigDecimal totalTg = new BigDecimal(user.getTotalTg());
                 BigDecimal tg = new BigDecimal(exchange.getAmount());
-
                 user.setTotalTg(totalTg.add(tg).toString());
                 userRepository.save(user);
 
