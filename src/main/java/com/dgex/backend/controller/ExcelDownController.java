@@ -8,6 +8,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,13 +25,21 @@ public class ExcelDownController {
     private final ExcelDownService excelDownService;
 
 
-    @ApiOperation(value = "엑셀다운로드")
+    /*@ApiOperation(value = "엑셀다운로드")
     @PostMapping(value = "/excelDown")
     public CommonResult excelDown(
             @RequestParam(value = "exchangeId", required = false) Integer exchangeId
     ) throws Exception {
         excelDownService.excelDown(exchangeId);
         return responseService.getSuccessResult();
+    }*/
+
+    @ApiOperation(value = "엑셀다운로드")
+    @GetMapping(value = "/excelDown")
+    public ResponseEntity<Resource> excelDown(
+            @RequestParam(value = "exchangeId", required = false) Integer exchangeId
+    ) throws Exception {
+        return excelDownService.excelDown(exchangeId);
     }
 
 }
