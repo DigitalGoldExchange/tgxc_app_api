@@ -142,8 +142,7 @@ public class ExchangeService {
         Map<String, Object> result = new HashMap<>();
         Exchange exchange = exchangeRepository.findById(exchangeId).get();
 
-        NumberFormat format = NumberFormat.getInstance();
-        format.setGroupingUsed(false);
+
 
 
         User user = exchange.getUser();
@@ -160,9 +159,14 @@ public class ExchangeService {
                 result.put("msg","이미 취소되었습니다.");
                 return result;
             }else{
-                String tgResult = format.format(Double.parseDouble(user.getTotalTg())+Double.parseDouble(exchange.getAmount()));
-                user.setTotalTg(tgResult);
+
+                BigDecimal totalTg = new BigDecimal(user.getTotalTg());
+                BigDecimal tg = new BigDecimal(exchange.getAmount());
+
+                user.setTotalTg(totalTg.add(tg).toString());
                 userRepository.save(user);
+
+
             }
         }
 
