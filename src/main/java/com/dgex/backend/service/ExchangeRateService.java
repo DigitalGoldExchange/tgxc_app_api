@@ -1,13 +1,7 @@
 package com.dgex.backend.service;
 
-import com.dgex.backend.entity.DepositAccount;
-import com.dgex.backend.entity.ExchangeMethod;
-import com.dgex.backend.entity.ExchangeRate;
-import com.dgex.backend.entity.ExchangeStore;
-import com.dgex.backend.repository.DepositAccountRepository;
-import com.dgex.backend.repository.ExchangeMethodRepository;
-import com.dgex.backend.repository.ExchangeRateRepository;
-import com.dgex.backend.repository.ExchangeStoreRepository;
+import com.dgex.backend.entity.*;
+import com.dgex.backend.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +19,7 @@ public class ExchangeRateService {
     private final ExchangeMethodRepository exchangeMethodRepository;
     private final ExchangeStoreRepository exchangeStoreRepository;
     private final DepositAccountRepository depositAccountRepository;
+    private final ExchangeRateTempRepository exchangeRateTempRepository;
 
     @Transactional
     public void insert(String exchangeRate, String exchangeGram){
@@ -40,7 +35,7 @@ public class ExchangeRateService {
     public Object getList(){
         Map<String, Object> result = new HashMap<>();
 
-//        List<ExchangeRate> exchangeRate = exchangeRateRepository.findByDeleteDatetimeIsNull();
+        ExchangeRateTemp exchangeRate = exchangeRateTempRepository.findByDeleteDatetimeIsNull();
         ExchangeMethod exchangeMethod = exchangeMethodRepository.findByDeleteDatetimeIsNull();
         List<ExchangeStore> inactiveStoreList = exchangeStoreRepository.findByDeleteDatetimeIsNullAndDispYn("N");
         List<ExchangeStore> activeStoreList = exchangeStoreRepository.findByDeleteDatetimeIsNullAndDispYn("Y");
@@ -48,7 +43,7 @@ public class ExchangeRateService {
 
         result.put("activeStoreList", activeStoreList);
         result.put("inactiveStoreList", inactiveStoreList);
-        result.put("exchangeRate", "1.15");
+        result.put("exchangeRate", exchangeRate);
         result.put("exchangeMethod", exchangeMethod.getName());
         result.put("depositAccount", depositAccount);
         return result;
