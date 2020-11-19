@@ -40,6 +40,24 @@ public class ExchangeRateService {
     public Object getList(){
         Map<String, Object> result = new HashMap<>();
 
+//        List<ExchangeRate> exchangeRate = exchangeRateRepository.findByDeleteDatetimeIsNull();
+        ExchangeMethod exchangeMethod = exchangeMethodRepository.findByDeleteDatetimeIsNull();
+        List<ExchangeStore> inactiveStoreList = exchangeStoreRepository.findByDeleteDatetimeIsNullAndDispYn("N");
+        List<ExchangeStore> activeStoreList = exchangeStoreRepository.findByDeleteDatetimeIsNullAndDispYn("Y");
+        DepositAccount depositAccount = depositAccountRepository.findByDeleteDatetimeIsNull();
+
+        result.put("activeStoreList", activeStoreList);
+        result.put("inactiveStoreList", inactiveStoreList);
+        result.put("exchangeRate", "1.15");
+        result.put("exchangeMethod", exchangeMethod.getName());
+        result.put("depositAccount", depositAccount);
+        return result;
+    }
+
+    @Transactional
+    public Object getList1(){
+        Map<String, Object> result = new HashMap<>();
+
         List<ExchangeRate> exchangeRate = exchangeRateRepository.findByDeleteDatetimeIsNull();
         ExchangeMethod exchangeMethod = exchangeMethodRepository.findByDeleteDatetimeIsNull();
         List<ExchangeStore> inactiveStoreList = exchangeStoreRepository.findByDeleteDatetimeIsNullAndDispYn("N");

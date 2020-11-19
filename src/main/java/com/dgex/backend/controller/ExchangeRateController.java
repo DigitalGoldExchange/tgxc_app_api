@@ -38,6 +38,13 @@ public class ExchangeRateController {
     }
 
     @ApiOperation(value = "교환비율 리스트")
+    @GetMapping(value = "/getList1")
+    public SingleResult<Object> getList1(
+    ) {
+        return responseService.getSingleResult(exchangeRateService.getList1());
+    }
+
+    @ApiOperation(value = "교환비율 리스트")
     @GetMapping(value = "/getOne")
     public SingleResult<Object> getOne(
             @RequestParam(value = "exchangeRateId", required = false) Integer exchangeRateId
