@@ -138,7 +138,7 @@ public class PushInfoService {
     @Transactional
     public Object userPushList(Integer userId) {
         User user = userRepository.findById(userId).get();
-        List<PushInfo> pushInfoList = pushInfoRepository.findByDeleteDatetimeIsNullAndUser(user);
+        List<PushInfo> pushInfoList = pushInfoRepository.findByDeleteDatetimeIsNullAndUserOrderByCreateDatetimeDesc(user);
 
 
         Map<String, Object> result = new HashMap<>();

@@ -220,6 +220,95 @@ public class ExchangeService {
     }
 
     @Transactional
+    public Object userCancel(Integer exchangeId, String status) {
+        Map<String, Object> result = new HashMap<>();
+        Exchange exchange = exchangeRepository.findById(exchangeId).get();
+
+
+        User user = exchange.getUser();
+
+        if("취소".equals(status) || "반려".equals(status)){
+
+            if(exchange.getStatus().equals("취소")){
+                result.put("result",false);
+                result.put("msg","이미 취소된 내역입니다.");
+                return result;
+            }else if(exchange.getStatus().equals("반려")){
+                result.put("result",false);
+                result.put("msg","이미 반려된 내역입니다.");
+                return result;
+            }else if(exchange.getStatus().equals("완료")){
+                result.put("result",false);
+                result.put("msg","이미 완료된 내역입니다.");
+                return result;
+            }else if(exchange.getStatus().equals("승인")){
+                result.put("result",false);
+                result.put("msg","이미 승인된 내역입니다.");
+                return result;
+            }else{
+
+                BigDecimal totalTg = new BigDecimal(user.getTotalTg());
+                BigDecimal tg = new BigDecimal(exchange.getAmount());
+                user.setTotalTg(totalTg.add(tg).toString());
+                userRepository.save(user);
+
+
+            }
+        }
+
+        //최초 신청 날짜
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        String tradeTime = dateFormat.format(exchange.getCreateDatetime());
+        String tradeType = null;
+        String pushStatus = null;
+        if(user.getKoreanYn().equals("Y")){
+            if(exchange.getTradeType().equals("OUT")){
+                tradeType = "출금";
+            }else if(exchange.getTradeType().equals("EXCHANGE")){
+                tradeType = "교환 신청";
+            }
+        }else{
+            if(exchange.getTradeType().equals("OUT")){
+                tradeType = "Withdraw";
+            }else if(exchange.getTradeType().equals("EXCHANGE")){
+                tradeType = "TG Exchange";
+            }
+
+            if(status.equals("완료")){
+                pushStatus = "completed";
+            }else if(status.equals("승인")){
+                pushStatus = "approved";
+            }else if(status.equals("반려")){
+                pushStatus = "rejected";
+            }else if(status.equals("취소")){
+                pushStatus = "cancelled";
+            }
+
+        }
+
+        if("A".equals(user.getPushType()) || "M".equals(user.getPushType()) ){
+            String title = null;
+            String content = null;
+
+            if(user.getKoreanYn().equals("Y")){
+                title = "[알림] "+tradeType+"이 "+status+" 되었습니다.";
+                content = "안녕하세요."+user.getName()+"님, "+tradeTime+"에 신청하신"+exchange.getAmount()+"TG "+tradeType+"이 "+status+"되었습니다.";
+            }else{
+                title = "[Alert] "+tradeType+" Request has been "+pushStatus;
+                content = "Hi "+user.getName()+", You request for "+tradeType+"with "+exchange.getAmount()+ " on "+tradeTime+" has been "+pushStatus+".";
+            }
+
+            pushInfoService.sendPush(user.getUserId(), title, content);
+        }
+
+        exchange.setStatus(status);
+        exchange.setUpdateDatetime(new Date());
+        exchangeRepository.save(exchange);
+        result.put("result",true);
+        return result;
+    }
+
+    @Transactional
     public void depositUpdate(Integer exchangeId, String status, String txid) {
         Exchange exchange = exchangeRepository.findById(exchangeId).get();
         exchange.setTxId(txid);

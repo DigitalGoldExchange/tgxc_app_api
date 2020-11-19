@@ -68,6 +68,15 @@ public class ExchangeController {
         return responseService.getSingleResult(exchangeService.update(exchangeId, status, note));
     }
 
+    @ApiOperation(value = "거래 수정", notes = "거래 정보를 수정한다.")
+    @PostMapping(value = "/userCancel")
+    public SingleResult<Object> userCancel(
+            @RequestParam(value = "exchangeId", required = false) Integer exchangeId,
+            @RequestParam(value = "status", required = false) String status
+    ) {
+        return responseService.getSingleResult(exchangeService.userCancel(exchangeId, status));
+    }
+
 
     @ApiOperation(value = "거래 수정", notes = "거래 정보를 수정한다.")
     @PostMapping(value = "/depositUpdate")

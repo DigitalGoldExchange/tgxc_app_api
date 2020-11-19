@@ -12,4 +12,6 @@ public interface PushInfoRepository extends JpaRepository<PushInfo, Integer> {
 
     List<PushInfo> findByDeleteDatetimeIsNullAndUser(User user);
 
+    List<PushInfo> findByDeleteDatetimeIsNullAndUserOrderByCreateDatetimeDesc(User user);
+
 }
