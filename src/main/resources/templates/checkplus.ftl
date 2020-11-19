@@ -13,7 +13,7 @@
 </form>
 <script>
     function goNice(){
-        document.form_chk.action = "http://nice.checkplus.co.kr/CheckPlusSafeModel/checkplus.cb";
+        document.form_chk.action = "https://nice.checkplus.co.kr/CheckPlusSafeModel/checkplus.cb";
         document.form_chk.submit();
     }
 </script>
