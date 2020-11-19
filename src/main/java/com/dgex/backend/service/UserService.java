@@ -545,6 +545,49 @@ public class UserService {
     }
 
     @Transactional
+    public Object loginCheck1(String emailId, String password, String deviceToken, String deviceType, String role) {
+        Map<String, Object> result = new HashMap<>();
+        User user = null;
+        if("admin".equals(role)){
+            user = userRepository.findByDeleteDatetimeIsNullAndEmailIdAndLevelIsNot(emailId, "USER");
+        }else{
+            user = userRepository.findByDeleteDatetimeIsNullAndEmailId(emailId);
+        }
+
+        if(user == null){
+            result.put("result", false);
+        }else{
+            user.setDeviceToken(deviceToken);
+            user.setDeviceType(deviceType);
+            user.setUpdateDatetime(new Date());
+            userRepository.save(user);
+
+            List<Exchange> exchangeList = exchangeRepository.findByDeleteDatetimeIsNullAndUserOrderByCreateDatetimeDesc(user);
+            ServerManage serverManage = serverManageRepository.findByDeleteDatetimeIsNull();
+
+
+            BCryptPasswordEncoder pe = new BCryptPasswordEncoder();
+            if(pe.matches(password, user.getPassword())){
+                result.put("result", true);
+                result.put("user", user);
+                result.put("serverManage",serverManage);
+                result.put("token", jwtTokenProvider.createToken(String.valueOf(user.getUserId())));
+                if(exchangeList != null){
+                    result.put("exchangeList", exchangeList);
+                }else{
+                    result.put("exchangeList", false);
+                }
+
+            }else{
+                result.put("result", false);
+            }
+        }
+
+        return result;
+    }
+
+
+    @Transactional
     public Object passwordCheck(Integer userId, String password) {
         Map<String, Object> result = new HashMap<>();
         User user = userRepository.findById(userId).get();
