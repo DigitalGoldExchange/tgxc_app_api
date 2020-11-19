@@ -45,8 +45,8 @@ public class ExcelDownService {
         String tradeTime = dateFormat.format(exchange.getUpdateDatetime());
         String nowTime = dateFormat.format(nowDate);
 
-        configuration.setClassForTemplateLoading(this.getClass(), "/templates/");
-        final Template t = configuration.getTemplate("pdf/exchange_order.ftl");
+        configuration.setClassForTemplateLoading(this.getClass(), "/templates");
+        final Template t = configuration.getTemplate("exchange_order.ftl");
         final Map<String, Object> mavObject = new HashMap<>();
         mavObject.put("exchange",exchange);
         mavObject.put("uploadDir",uploadDir);
