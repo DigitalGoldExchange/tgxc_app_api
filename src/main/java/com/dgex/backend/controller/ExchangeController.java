@@ -136,6 +136,24 @@ public class ExchangeController {
             @RequestParam(value = "identifyCard") MultipartFile identifyCard,
             @RequestParam(value = "profileImage") MultipartFile profileImage,
             @RequestParam(value = "exchangeStoreId") Integer exchangeStoreId,
+            @RequestParam(value = "reqType", required = false) String reqType,
+            @RequestParam(value = "reqQty", required = false) String reqQty
+
+    ) {
+        exchangeService.insertExchange(userId, walletAddr,exchangeMethod, reqAmount, identifyCard, profileImage, exchangeStoreId, reqType, reqQty);
+        return responseService.getSuccessResult();
+    }
+
+    @ApiOperation(value = "교환 등록")
+    @PostMapping(value = "/insertExchangeAnd")
+    public CommonResult insertExchangeAnd(
+            @RequestParam(value = "userId") Integer userId,
+            @RequestParam(value = "walletAddr", required = false) String walletAddr,
+            @RequestParam(value = "exchangeMethod") String exchangeMethod,
+            @RequestParam(value = "reqAmount") String reqAmount,
+            @RequestParam(value = "identifyCard") MultipartFile identifyCard,
+            @RequestParam(value = "profileImage") MultipartFile profileImage,
+            @RequestParam(value = "exchangeStoreId") Integer exchangeStoreId,
             @RequestParam(value = "reqType") String reqType,
             @RequestParam(value = "reqQty") String reqQty
 

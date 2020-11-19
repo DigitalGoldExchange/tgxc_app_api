@@ -423,8 +423,18 @@ public class ExchangeService {
         exchange.setUser(user);
         exchange.setExchangeMethod(exchangeMethod);
         exchange.setExchangeStore(exchangeStore);
-        exchange.setReqQty(reqQty);
-        exchange.setReqType(reqType);
+        if(reqQty != null){
+            exchange.setReqQty(reqQty);
+        }else{
+            exchange.setReqQty("0");
+        }
+        if(reqType != null){
+            exchange.setReqType(reqType);
+        }else {
+            exchange.setReqType("0");
+        }
+
+
         Exchange newEx = exchangeRepository.save(exchange);
 
         if(profileImage != null && identifyCard != null){
