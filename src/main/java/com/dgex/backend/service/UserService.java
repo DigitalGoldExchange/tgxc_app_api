@@ -505,6 +505,7 @@ public class UserService {
     @Transactional
     public Object loginCheck(String emailId, String password, String deviceToken, String deviceType, String role) {
         Map<String, Object> result = new HashMap<>();
+        System.out.println("11111111"+emailId);
         User user = null;
         if("admin".equals(role)){
             user = userRepository.findByDeleteDatetimeIsNullAndEmailIdAndLevelIsNot(emailId, "USER");
