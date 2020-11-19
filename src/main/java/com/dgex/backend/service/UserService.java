@@ -93,7 +93,13 @@ public class UserService {
             params.put("name", name);
             params.put("emailId", emailId);
             params.put("url", "https://api.tgxc.net/user/signUpConfirm?email="+emailId+"&authKey="+signKey);
-            Template t = configuration.getTemplate("auth_mail.ftl");
+            Template t = null;
+            if("Y".equals(isKorea)){
+                t = configuration.getTemplate("auth_mail.ftl");
+            }else {
+                t = configuration.getTemplate("auth_mail_en.ftl");
+            }
+
             final String content = FreeMarkerTemplateUtils.processTemplateIntoString(t, params);
             msg.setSubject("회원가입 이메일 인증 메일입니다.");
             msg.setText(content, charset, "html");
@@ -129,14 +135,21 @@ public class UserService {
         User user = userRepository.findByDeleteDatetimeIsNullAndEmailIdAndSignKey(emailId, signKey);
 
         if(user != null){
-            if(user.getKoreanYn().equals("Y")){
-                user.setStatus(2);
+            if("N".equals(user.getSignYn())){
+                if(user.getKoreanYn().equals("Y")){
+                    user.setStatus(2);
+                }else{
+                    user.setStatus(4);
+                }
+                user.setSignYn("Y");
+                user.setUpdateDatetime(new Date());
+                userRepository.save(user);
+                return true;
             }else{
-                user.setStatus(4);
+                result.put("msg","이미 인증되었습니다.");
+                result.put("result",false);
+                return false;
             }
-            user.setUpdateDatetime(new Date());
-            userRepository.save(user);
-            return true;
         }else{
             result.put("msg","회원 정보를 찾을 수 없습니다.");
             result.put("result",false);
@@ -180,6 +193,7 @@ public class UserService {
             user.setTotalTg("0");
             user.setStatus(0);
             user.setPushType("A");
+            user.setSignYn("N");
             user.setDeviceToken(user.getDeviceToken());
             user.setSignKey(newPw);
             User newUser = userRepository.save(user);

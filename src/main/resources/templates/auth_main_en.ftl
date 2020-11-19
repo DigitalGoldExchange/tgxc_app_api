@@ -20,19 +20,19 @@
         </td>
     </tr>
     <tr>
-        <td style="text-align:center; height: 20px; padding-bottom: 30px; padding-top: 30px">환영합니다! ${name!}</td>
+        <td style="text-align:center; height: 20px; padding-bottom: 30px; padding-top: 30px">Welcome, ${name!}!</td>
     </tr>
     <tr>
-        <td style="text-align:center; padding-bottom: 5px">TGXC 가입을 축하드립니다!</td>
+        <td style="text-align:center; padding-bottom: 5px">Thank you for using TGXC.</td>
     </tr>
     <tr>
-        <td style="text-align:center; padding-bottom: 5px">가압하신 ID는 ${emailId!}입니다.</td>
+        <td style="text-align:center; padding-bottom: 5px">Your user ID is ${emailId!}.</td>
     </tr>
     <tr>
-        <td style="text-align:center; padding-bottom: 10px">아래 <span style="color:#d5ad42">버튼</span>을 클릭하여 가입을 완료해 주세요.</td>
+        <td style="text-align:center; padding-bottom: 10px">Please click the  <span style="color:#d5ad42">button</span> below to verify your email.</td>
     </tr>
     <tr>
-        <td style="text-align:center"><input type="button" style="background-color:#d5ad42;width:118px;height:30px;color:#fff" value="가입 완료" onclick="document.location.href='${url!}'" target="_blank"></td>
+        <td style="text-align:center"><input type="button" style="background-color:#d5ad42;width:118px;height:30px;color:#fff" value="Confirm" onclick="document.location.href='${url!}'" target="_blank"></td>
     </tr>
 </table>
 

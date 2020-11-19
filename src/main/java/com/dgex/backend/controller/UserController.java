@@ -59,7 +59,7 @@ public class UserController {
         if(result){
             out.println("<script>alert('인증되었습니다.'); window.open('','_self').close();</script>");
         }else{
-            out.println("<script>alert('인증 실패했습니다..'); window.open('','_self').close();</script>");
+            out.println("<script>alert('이미 인증되었습니다.'); window.open('','_self').close();</script>");
         }
 
     }

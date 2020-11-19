@@ -84,6 +84,10 @@ public class User {
 
     //인증키
     @Column
+    private String signYn;
+
+    //인증키
+    @Column
     private String otpKey;
 
     //인증키
