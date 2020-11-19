@@ -200,7 +200,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "로그인", notes = "회원 로그인 정보를 받아 일치 여부를 조회한다.")
-    @GetMapping(value = "/login")
+    @PostMapping(value = "/login")
     public SingleResult<Object> login(
             @RequestParam(value = "emailId", required = false) String emailId,
             @RequestParam(value = "password", required = false) String password,
