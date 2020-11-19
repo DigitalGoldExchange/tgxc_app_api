@@ -42,7 +42,13 @@ public class ExcelDownService {
 
         Date nowDate = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
-        String tradeTime = dateFormat.format(exchange.getUpdateDatetime());
+        String tradeTime = null;
+        if(exchange.getUpdateDatetime() != null){
+            tradeTime = dateFormat.format(exchange.getUpdateDatetime());
+        }else {
+            tradeTime = dateFormat.format(exchange.getCreateDatetime());
+        }
+
         String nowTime = dateFormat.format(nowDate);
 
         configuration.setClassForTemplateLoading(this.getClass(), "/templates/");
