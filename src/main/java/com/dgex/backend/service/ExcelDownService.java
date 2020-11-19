@@ -41,6 +41,7 @@ public class ExcelDownService {
         UserExchangeImage userExchangeImage = userExchangeImageRepository.findByDeleteDatetimeIsNullAndExchange(exchange);
 
         Date nowDate = new Date();
+        SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
         String tradeTime = null;
         if(exchange.getUpdateDatetime() != null){
@@ -48,7 +49,7 @@ public class ExcelDownService {
         }else {
             tradeTime = dateFormat.format(exchange.getCreateDatetime());
         }
-
+        String createTime = dateFormat1.format(exchange.getCreateDatetime());
         String nowTime = dateFormat.format(nowDate);
 
         configuration.setClassForTemplateLoading(this.getClass(), "/templates/");
@@ -59,6 +60,7 @@ public class ExcelDownService {
         mavObject.put("userExchangeImage",userExchangeImage);
         mavObject.put("tradeTime",tradeTime);
         mavObject.put("nowTime",nowTime);
+        mavObject.put("createTime",createTime);
 
         String content = FreeMarkerTemplateUtils.processTemplateIntoString(t, mavObject);
         InputStream targetStream = new ByteArrayInputStream(content.getBytes());

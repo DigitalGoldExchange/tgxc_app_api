@@ -12,7 +12,7 @@
         <div>
             <div style="text-align: center; margin-bottom:50px">TGXC 금 교환 신청서</div>
             <div style="margin-bottom:10px">신청번호 : ${exchange.reqNumber!}</div>
-            <div style="margin-bottom:10px">신청일 : ${exchange.createDatetime!}</div>
+            <div style="margin-bottom:10px">신청일 : ${createTime!}</div>
             <div style="margin-bottom:10px">신청인 : ${exchange.user.name!}</div>
             <div style="margin-bottom:10px">이메일 : ${exchange.user.emailId!}</div>
             <div style="margin-bottom:15px">신청정보 : ${exchange.reqType!}, ${exchange.reqQty!}개, ${exchange.amount!}TG</div>
