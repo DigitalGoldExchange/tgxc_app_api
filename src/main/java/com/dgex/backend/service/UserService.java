@@ -92,7 +92,7 @@ public class UserService {
 
             params.put("name", name);
             params.put("emailId", emailId);
-            params.put("url", "http://117.52.98.39:8093/user/signUpConfirm?email="+emailId+"&authKey="+signKey);
+            params.put("url", "https://api.tgxc.net/user/signUpConfirm?email="+emailId+"&authKey="+signKey);
             Template t = configuration.getTemplate("auth_mail.ftl");
             final String content = FreeMarkerTemplateUtils.processTemplateIntoString(t, params);
             msg.setSubject("회원가입 이메일 인증 메일입니다.");

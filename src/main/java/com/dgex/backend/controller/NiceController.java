@@ -69,8 +69,10 @@ public class NiceController {
 //        String sErrorUrl = "http://localhost:8093/nice/niceFail";         // 실패시 이동될 URL
 //        String sReturnUrl = "http://10.0.2.2:8093/nice/niceSuccess";      // 성공시 이동될 URL
 //        String sErrorUrl = "http://10.0.2.2:8093/nice/niceFail";         // 실패시 이동될 URL
-        String sReturnUrl = "http://117.52.98.39:8093/nice/niceSuccess";      // 성공시 이동될 URL
-        String sErrorUrl = "http://117.52.98.39:8093/nice/niceFail";         // 실패시 이동될 URL
+//        String sReturnUrl = "http://117.52.98.39:8093/nice/niceSuccess";      // 성공시 이동될 URL
+//        String sErrorUrl = "http://117.52.98.39:8093/nice/niceFail";         // 실패시 이동될 URL
+        String sReturnUrl = "https://api.tgxc.net/nice/niceSuccess";      // 성공시 이동될 URL
+        String sErrorUrl = "https://api.tgxc.net/nice/niceFail";         // 실패시 이동될 URL
 
 
 // 입력될 plain 데이타를 만든다.
