@@ -89,11 +89,10 @@ public class UserService {
         String charset = "UTF-8";
         try{
             final Map<String, Object> params = new HashMap<>();
-
             params.put("name", name);
             params.put("emailId", emailId);
             params.put("url", "https://api.tgxc.net/user/signUpConfirm?email="+emailId+"&authKey="+signKey);
-            Template t = null;
+            Template t;
             if("Y".equals(isKorea)){
                 t = configuration.getTemplate("auth_mail.ftl");
             }else {

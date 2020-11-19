@@ -13,7 +13,7 @@
             <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8f7f5;margin:0 auto;width:100%;border-bottom:1px solid #5f4f36;height:130px">
                 <tr>
                     <td style="text-align:center;padding-top:60px">
-                        <img src="/assets/images/553x.png" style="width: 160px; height: 128.4px;"/>
+                        <img src="https://api.tgxc.net/uploads/553x.png" style="width: 160px; height: 128.4px;"/>
                     </td>
                 </tr>
             </table>
