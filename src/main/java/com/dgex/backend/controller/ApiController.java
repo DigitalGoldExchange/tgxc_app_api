@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.security.InvalidKeyException;
 import java.security.SignatureException;
+import java.util.HashMap;
 import java.util.Map;
 
 @Api(tags = {"Api"})
@@ -40,15 +41,18 @@ public class ApiController {
 
         String ipAddress = request.getRemoteAddr();
 
-        System.out.println(ipAddress);
-
-        Map<String, Object> result = userService.userInfo(identifyNumber,token);
-        if(result.get("code")=="0000"){
-            return responseService.getSuccessResult();
+        if("211.62.106.9".equals(ipAddress) || "220.117.179.68".equals(ipAddress)){
+            Map<String, Object> result = userService.userInfo(identifyNumber,token);
+            if(result.get("code")=="0000"){
+                return responseService.getSuccessResult();
+            }else{
+                return responseService.getFailResult(0000, result.get("msg").toString());
+            }
         }else{
-            return responseService.getFailResult(0000, result.get("msg").toString());
+            return responseService.getFailResult(0004, "허용된 IP가 아닙니다.");
         }
-//        return responseService.getSingleResult();
+
+
     }
 
     @ApiOperation(value = "장부등록")
@@ -58,23 +62,46 @@ public class ApiController {
             @RequestParam(value = "txid") String txId,
             @RequestParam(value = "amount") String amount,
             @RequestParam(value = "txidTime") String txidTime,
-            @RequestHeader(value = "token") String token
+            @RequestHeader(value = "token") String token,
+            HttpServletRequest request
     ) throws SignatureException {
-        Map<String, Object> result = exchangeService.insertBook(identifyNumber,txId, amount, txidTime, token);
-        if(result.get("code")=="0000"){
-            return responseService.getSuccessResult();
+
+        String ipAddress = request.getRemoteAddr();
+
+        if("211.62.106.9".equals(ipAddress) || "220.117.179.68".equals(ipAddress)){
+            Map<String, Object> result = exchangeService.insertBook(identifyNumber,txId, amount, txidTime, token);
+            if(result.get("code")=="0000"){
+                return responseService.getSuccessResult();
+            }else{
+                return responseService.getFailResult(0001, result.get("msg").toString());
+            }
         }else{
-            return responseService.getFailResult(0001, result.get("msg").toString());
+            return responseService.getFailResult(0004, "허용된 IP가 아닙니다.");
         }
+
+
     }
 
     @ApiOperation(value = "장부확인")
     @GetMapping(value = "/checkBook")
     public SingleResult<Object> checkBook(
             @RequestParam(value = "txid") String txId,
-            @RequestHeader(value = "token") String token
+            @RequestHeader(value = "token") String token,
+            HttpServletRequest request
     ) throws SignatureException {
-        return responseService.getSingleResult(exchangeService.checkBook(txId, token));
+
+        String ipAddress = request.getRemoteAddr();
+
+        if("211.62.106.9".equals(ipAddress) || "220.117.179.68".equals(ipAddress)){
+            return responseService.getSingleResult(exchangeService.checkBook(txId, token));
+        }else{
+            Map<String, Object> result = new HashMap<>();
+            result.put("result", false);
+            result.put("msg", "허용된 IP가 아닙니다.");
+            return responseService.getSingleResult(result);
+        }
+
+
     }
 
 
