@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.security.InvalidKeyException;
 import java.security.SignatureException;
 import java.util.Map;
@@ -33,8 +34,14 @@ public class ApiController {
     @GetMapping(value = "/userInfo")
     public CommonResult userInfo(
             @RequestParam(value = "userId") String identifyNumber,
-            @RequestHeader(value = "token") String token
+            @RequestHeader(value = "token") String token,
+            HttpServletRequest request
     ) throws SignatureException {
+
+        String ipAddress = request.getRemoteAddr();
+
+        System.out.println(ipAddress);
+
         Map<String, Object> result = userService.userInfo(identifyNumber,token);
         if(result.get("code")=="0000"){
             return responseService.getSuccessResult();
