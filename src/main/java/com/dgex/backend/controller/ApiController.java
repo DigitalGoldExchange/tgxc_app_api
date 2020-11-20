@@ -60,7 +60,7 @@ public class ApiController {
 
         System.out.println(realIp[0]);
 
-        if("211.62.106.9".equals(realIp) || "220.117.179.68".equals(realIp)){
+        if("211.62.106.9".equals(realIp)){
             Map<String, Object> result = userService.userInfo(identifyNumber,token);
             if(result.get("code")=="0000"){
                 return responseService.getSuccessResult();
@@ -106,7 +106,7 @@ public class ApiController {
 
         System.out.println(realIp[0]);
 
-        if("211.62.106.9".equals(realIp) || "220.117.179.68".equals(realIp)){
+        if("211.62.106.9".equals(realIp)){
             Map<String, Object> result = exchangeService.insertBook(identifyNumber,txId, amount, txidTime, token);
             if(result.get("code")=="0000"){
                 return responseService.getSuccessResult();
@@ -149,7 +149,7 @@ public class ApiController {
 
         System.out.println(realIp[0]);
 
-        if("211.62.106.9".equals(realIp) || "220.117.179.68".equals(realIp)){
+        if("211.62.106.9".equals(realIp)){
             return responseService.getSingleResult(exchangeService.checkBook(txId, token));
         }else{
             Map<String, Object> result = new HashMap<>();
