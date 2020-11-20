@@ -32,7 +32,7 @@
         <td style="text-align:center; padding-bottom: 10px">Please click the  <span style="color:#d5ad42">button</span> below to verify your email.</td>
     </tr>
     <tr>
-        <td style="text-align:center"><input type="button" style="background-color:#d5ad42;width:118px;height:30px;color:#fff" value="Confirm" onclick="document.location.href='${url!}'" target="_blank">${url!}</td>
+        <td style="text-align:center"><input type="button" style="background-color:#d5ad42;width:118px;height:30px;color:#fff" value="Confirm" onclick="document.location.href='${url!}'" target="_blank"></td>
     </tr>
 </table>
 
