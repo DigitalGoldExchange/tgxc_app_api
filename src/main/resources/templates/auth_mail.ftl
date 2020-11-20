@@ -32,7 +32,7 @@
         <td style="text-align:center; padding-bottom: 10px">아래 <span style="color:#d5ad42">버튼</span>을 클릭하여 가입을 완료해 주세요.</td>
     </tr>
     <tr>
-        <td style="text-align:center"><input type="button" style="background-color:#d5ad42;width:118px;height:30px;color:#fff" value="가입 완료" onclick="document.location.href='${url!}'" target="_blank"></td>
+        <td style="text-align:center;width:118px;height:30px;color:#fff"><a href="${url!}" target="_blank">가입완료</a></td>
     </tr>
 </table>
 
