@@ -107,9 +107,9 @@ public class ApiController {
             ip = request.getRemoteAddr();
         }
 
+        String[] realIp = ip.split(",");
 
-
-        System.out.println("111111111"+ip);
+        System.out.println(realIp[0]);
 
         if("211.62.106.9".equals(ip) || "220.117.179.68".equals(ip)){
             return responseService.getSingleResult(exchangeService.checkBook(txId, token));
