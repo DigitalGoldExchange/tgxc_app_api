@@ -90,10 +90,28 @@ public class ApiController {
             HttpServletRequest request
     ) throws SignatureException {
 
-        String ipAddress = request.getRemoteAddr();
-        System.out.println("111111111"+ipAddress);
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_CLIENT_IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
 
-        if("211.62.106.9".equals(ipAddress) || "220.117.179.68".equals(ipAddress)){
+
+
+        System.out.println("111111111"+ip);
+
+        if("211.62.106.9".equals(ip) || "220.117.179.68".equals(ip)){
             return responseService.getSingleResult(exchangeService.checkBook(txId, token));
         }else{
             Map<String, Object> result = new HashMap<>();
