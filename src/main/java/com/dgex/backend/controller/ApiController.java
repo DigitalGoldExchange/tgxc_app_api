@@ -91,6 +91,7 @@ public class ApiController {
     ) throws SignatureException {
 
         String ipAddress = request.getRemoteAddr();
+        System.out.println("111111111"+ipAddress);
 
         if("211.62.106.9".equals(ipAddress) || "220.117.179.68".equals(ipAddress)){
             return responseService.getSingleResult(exchangeService.checkBook(txId, token));
