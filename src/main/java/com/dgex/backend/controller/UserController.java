@@ -211,6 +211,18 @@ public class UserController {
         return responseService.getSingleResult(userService.loginCheck(emailId, password, deviceToken, deviceType,role));
     }
 
+    @ApiOperation(value = "로그인", notes = "회원 로그인 정보를 받아 일치 여부를 조회한다.")
+    @PostMapping(value = "/login1")
+    public SingleResult<Object> login1(
+            @RequestParam(value = "emailId", required = false) String emailId,
+            @RequestParam(value = "password", required = false) String password,
+            @RequestParam(value = "deviceToken", required = false) String deviceToken,
+            @RequestParam(value = "deviceType", required = false) String deviceType,
+            @RequestParam(value = "role", required = false) String role
+    ) {
+        return responseService.getSingleResult(userService.loginCheck(emailId, password, deviceToken, deviceType,role));
+    }
+
 
 
     @ApiOperation(value = "회원 삭제", notes = "입력한 회원 정보를 삭제한다.")
