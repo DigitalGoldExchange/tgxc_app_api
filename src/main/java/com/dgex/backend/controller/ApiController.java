@@ -39,9 +39,28 @@ public class ApiController {
             HttpServletRequest request
     ) throws SignatureException {
 
-        String ipAddress = request.getRemoteAddr();
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_CLIENT_IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
 
-        if("211.62.106.9".equals(ipAddress) || "220.117.179.68".equals(ipAddress)){
+        String[] realIp = ip.split(",");
+
+        System.out.println(realIp[0]);
+
+        if("211.62.106.9".equals(realIp) || "220.117.179.68".equals(realIp)){
             Map<String, Object> result = userService.userInfo(identifyNumber,token);
             if(result.get("code")=="0000"){
                 return responseService.getSuccessResult();
@@ -66,9 +85,28 @@ public class ApiController {
             HttpServletRequest request
     ) throws SignatureException {
 
-        String ipAddress = request.getRemoteAddr();
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_CLIENT_IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
 
-        if("211.62.106.9".equals(ipAddress) || "220.117.179.68".equals(ipAddress)){
+        String[] realIp = ip.split(",");
+
+        System.out.println(realIp[0]);
+
+        if("211.62.106.9".equals(realIp) || "220.117.179.68".equals(realIp)){
             Map<String, Object> result = exchangeService.insertBook(identifyNumber,txId, amount, txidTime, token);
             if(result.get("code")=="0000"){
                 return responseService.getSuccessResult();
@@ -111,7 +149,7 @@ public class ApiController {
 
         System.out.println(realIp[0]);
 
-        if("211.62.106.9".equals(ip) || "220.117.179.68".equals(ip)){
+        if("211.62.106.9".equals(realIp) || "220.117.179.68".equals(realIp)){
             return responseService.getSingleResult(exchangeService.checkBook(txId, token));
         }else{
             Map<String, Object> result = new HashMap<>();
