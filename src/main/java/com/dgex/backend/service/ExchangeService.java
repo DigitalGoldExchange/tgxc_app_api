@@ -160,7 +160,7 @@ public class ExchangeService {
 
                 BigDecimal totalTg = new BigDecimal(user.getTotalTg());
                 BigDecimal tg = new BigDecimal(exchange.getAmount());
-                user.setTotalTg(totalTg.add(tg).toString());
+                user.setTotalTg(totalTg.add(tg).stripTrailingZeros().toPlainString());
                 userRepository.save(user);
 
 
@@ -203,7 +203,7 @@ public class ExchangeService {
 
             if(user.getKoreanYn().equals("Y")){
                 title = "[알림] "+tradeType+"이 "+status+" 되었습니다.";
-                content = "안녕하세요."+user.getName()+"님, "+tradeTime+"에 신청하신"+exchange.getAmount()+"TG "+tradeType+"이 "+status+"되었습니다.";
+                content = "안녕하세요."+user.getName()+"님, "+tradeTime+"에 신청하신 "+exchange.getAmount()+"TG "+tradeType+"이 "+status+"되었습니다.";
             }else{
                 title = "[Alert] "+tradeType+" Request has been "+pushStatus;
                 content = "Hi "+user.getName()+", You request for "+tradeType+"with "+exchange.getAmount()+ " on "+tradeTime+" has been "+pushStatus+".";
@@ -249,10 +249,8 @@ public class ExchangeService {
 
                 BigDecimal totalTg = new BigDecimal(user.getTotalTg());
                 BigDecimal tg = new BigDecimal(exchange.getAmount());
-                user.setTotalTg(totalTg.add(tg).toString());
+                user.setTotalTg(totalTg.add(tg).stripTrailingZeros().toPlainString());
                 userRepository.save(user);
-
-
             }
         }
 
@@ -292,7 +290,7 @@ public class ExchangeService {
 
             if(user.getKoreanYn().equals("Y")){
                 title = "[알림] "+tradeType+"이 "+status+" 되었습니다.";
-                content = "안녕하세요."+user.getName()+"님, "+tradeTime+"에 신청하신"+exchange.getAmount()+"TG "+tradeType+"이 "+status+"되었습니다.";
+                content = "안녕하세요."+user.getName()+"님, "+tradeTime+"에 신청하신 "+exchange.getAmount()+"TG "+tradeType+"이 "+status+"되었습니다.";
             }else{
                 title = "[Alert] "+tradeType+" Request has been "+pushStatus;
                 content = "Hi "+user.getName()+", You request for "+tradeType+"with "+exchange.getAmount()+ " on "+tradeTime+" has been "+pushStatus+".";
@@ -373,7 +371,7 @@ public class ExchangeService {
         BigDecimal totalTg = new BigDecimal(user.getTotalTg());
         BigDecimal tg = new BigDecimal(sendTg);
 
-        user.setTotalTg(totalTg.subtract(tg).toString());
+        user.setTotalTg(totalTg.subtract(tg).stripTrailingZeros().toPlainString());
         userRepository.save(user);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMddHHmmss");
@@ -403,7 +401,7 @@ public class ExchangeService {
         BigDecimal totalTg = new BigDecimal(user.getTotalTg());
         BigDecimal tg = new BigDecimal(reqAmount);
 
-        user.setTotalTg(totalTg.subtract(tg).toString());
+        user.setTotalTg(totalTg.subtract(tg).stripTrailingZeros().toPlainString());
         userRepository.save(user);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMddHHmmss");
@@ -493,7 +491,7 @@ public class ExchangeService {
 
                             if(user.getKoreanYn().equals("Y")){
                                 title = "[알림] "+amount+"TG 입금이 완료 되었습니다.";
-                                content = "안녕하세요."+user.getName()+"님, "+amount+"TG 입금이 완료 되었습니다.";
+                                content = "안녕하세요. "+user.getName()+"님, "+amount+"TG 입금이 완료 되었습니다.";
                             }else{
                                 title = "[Alert] "+amount+"TG has been deposited";
                                 content = "Hi "+user.getName()+", "+amount+"TG has been deposited on your account";

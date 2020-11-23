@@ -32,7 +32,7 @@ public class ExchangeRateService {
     }
 
     @Transactional
-    public Object getList(){
+    public Object getList1(){
         Map<String, Object> result = new HashMap<>();
 
         ExchangeRateTemp exchangeRate = exchangeRateTempRepository.findByDeleteDatetimeIsNull();
@@ -50,7 +50,7 @@ public class ExchangeRateService {
     }
 
     @Transactional
-    public Object getList1(){
+    public Object getList(){
         Map<String, Object> result = new HashMap<>();
 
         List<ExchangeRate> exchangeRate = exchangeRateRepository.findByDeleteDatetimeIsNull();

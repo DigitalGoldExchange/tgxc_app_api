@@ -14,9 +14,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
@@ -35,7 +40,7 @@ public class UserController {
 
     @ApiOperation(value = "회원 등록", notes = "입력한 회원 정보를 등록한다.")
     @PostMapping(value = "/insert")
-    public SingleResult<Object> insert(User user,@RequestParam(value = "profileImage", required = false) MultipartFile profileImage) {
+    public SingleResult<Object> insert(User user,@RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws NoSuchPaddingException, InvalidKeyException, UnsupportedEncodingException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
 //        Map<String, Object> result = userService.insert(user, profileImage);
 //        if(result.get("code")=="0001"){
 //            return responseService.getSuccessResult();
@@ -178,7 +183,7 @@ public class UserController {
     @GetMapping(value = "/getOne")
     public SingleResult<Object> getOne(
             @RequestParam(value = "userId", required = false) Integer userId
-    ) {
+    ) throws NoSuchPaddingException, InvalidKeyException, UnsupportedEncodingException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
         return responseService.getSingleResult(userService.findByUserInfo(userId));
     }
 
@@ -325,7 +330,7 @@ public class UserController {
             @RequestParam(value = "phoneNumber", required = false) String phoneNumber,
             @RequestParam(value = "password", required = false) String password,
             @RequestParam(value = "zipCode", required = false) String zipCode
-    ) {
+    ) throws UnsupportedEncodingException, NoSuchPaddingException, InvalidKeyException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
         userService.updateUser(userId, address, addressDetail, phoneNumber, password, zipCode);
         return responseService.getSuccessResult();
     }
@@ -340,6 +345,16 @@ public class UserController {
         userService.updatePushType(userId, pushType);
         return responseService.getSuccessResult();
     }
+
+    @ApiOperation(value = "암호화")
+    @PostMapping(value = "/updateUserInfoEncode")
+    public CommonResult updateUserInfoEncode(
+            @RequestParam(value = "userId", required = false) Integer userId
+    ) throws NoSuchPaddingException, InvalidKeyException, UnsupportedEncodingException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+        userService.updateUserInfoEncode(userId);
+        return responseService.getSuccessResult();
+    }
+
 
 
 

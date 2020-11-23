@@ -1,13 +1,11 @@
 package com.dgex.backend.service;
-
-import ch.qos.logback.core.encoder.EchoEncoder;
 import com.dgex.backend.config.JwtTokenProvider;
 import com.dgex.backend.entity.*;
 import com.dgex.backend.repository.*;
 import com.dgex.backend.service.common.FileManageService;
+import com.dgex.backend.util.AES256Util;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
-import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.binary.Base32;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,24 +15,22 @@ import org.springframework.data.domain.Sort;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.Mac;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletResponse;
-import java.math.BigDecimal;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.SignatureException;
+import java.io.UnsupportedEncodingException;
+import java.security.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -61,6 +57,9 @@ public class UserService {
     static final String CD = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     static SecureRandom rnd = new SecureRandom();
 
+    private String iv;
+    private Key keySpec;
+
     String randomString(int len) {
         StringBuilder sb = new StringBuilder(len);
         for (int i = 0; i < len; i++) sb.append(AB.charAt(rnd.nextInt(AB.length())));
@@ -80,6 +79,7 @@ public class UserService {
         }
         return sb.toString();
     }
+
 
     @Async
     public Object sendSignKey(String emailId,String name,String isKorea, String signKey){
@@ -158,7 +158,7 @@ public class UserService {
     }
 
     @Transactional
-    public Map<String,Object> insert(User user, MultipartFile profileImage) {
+    public Map<String,Object> insert(User user, MultipartFile profileImage) throws UnsupportedEncodingException, NoSuchPaddingException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         Map<String,Object> result = new HashMap<>();
         if(user.getEmailId()=="" || user.getPassword()=="" /*|| user.getName()=="" || user.getPhoneNumber()=="" */){
             result.put("code", "0000");
@@ -181,9 +181,14 @@ public class UserService {
 
             user.setIdentifyNumber(randomIdentifyNumber(key));
             user.setEmailId(user.getEmailId());
-            user.setAddress(user.getAddress());
-            user.setAddressDetail(user.getAddressDetail());
-            user.setZipCode(user.getZipCode());
+            AES256Util aes256Util = new AES256Util();
+            user.setAddress(aes256Util.aesEncode(user.getAddress()));
+            user.setAddressDetail(aes256Util.aesEncode(user.getAddressDetail()));
+            user.setBirthDay(aes256Util.aesEncode(user.getBirthDay()));
+            user.setZipCode(aes256Util.aesEncode(user.getZipCode()));
+//            user.setAddress(user.getAddress());
+//            user.setAddressDetail(user.getAddressDetail());
+//            user.setZipCode(user.getZipCode());
             user.setName(user.getName());
             user.setPhoneNumber(user.getPhoneNumber());
             user.setCreateDatetime(new Date());
@@ -347,19 +352,23 @@ public class UserService {
 
 
     @Transactional
-    public void updateUser(Integer userId,String address,String addressDetail,String phoneNumber, String password, String zipCode) {
+    public void updateUser(Integer userId,String address,String addressDetail,String phoneNumber, String password, String zipCode) throws UnsupportedEncodingException, NoSuchPaddingException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         User user = userRepository.findById(userId).get();
+        AES256Util aes256Util = new AES256Util();
         if(address != null){
-            user.setAddress(address);
+//            user.setAddress(address);
+            user.setAddress(aes256Util.aesEncode(address));
         }
         if(addressDetail != null){
-            user.setAddressDetail(addressDetail);
+//            user.setAddressDetail(addressDetail);
+            user.setAddressDetail(aes256Util.aesEncode(addressDetail));
         }
         if(phoneNumber != null){
             user.setPhoneNumber(phoneNumber);
         }
         if(zipCode != null){
-            user.setZipCode(zipCode);
+//            user.setZipCode(zipCode);
+            user.setZipCode(aes256Util.aesEncode(zipCode));
         }
         if(password != null) {
             BCryptPasswordEncoder pe = new BCryptPasswordEncoder();
@@ -378,16 +387,30 @@ public class UserService {
     }
 
     @Transactional
-    public Object findByUserInfo(Integer userId) {
+    public Object findByUserInfo(Integer userId) throws UnsupportedEncodingException, NoSuchPaddingException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         User user = userRepository.findById(userId).get();
         List<Exchange> exchangeList = exchangeRepository.findByDeleteDatetimeIsNullAndUserOrderByCreateDatetimeDesc(user);
         UserPassportImage userPassportImage = userPassportImageRepository.findByDeleteDatetimeIsNullAndUser(user);
         Integer unreadPushCount = pushInfoRepository.countByDeleteDatetimeIsNullAndUserAndReadYn(user, "N");
         Map<String, Object> result = new HashMap<>();
+        AES256Util aes256Util = new AES256Util();
 
         result.put("exchangeList", exchangeList);
         result.put("userPassportImage", userPassportImage);
         result.put("user",user);
+        try{
+            aes256Util.aesDecode(user.getAddress());
+        }catch (IllegalBlockSizeException e){
+            user.setAddress(aes256Util.aesEncode(user.getAddress()));
+            user.setAddressDetail(aes256Util.aesEncode(user.getAddressDetail()));
+            user.setBirthDay(aes256Util.aesEncode(user.getBirthDay()));
+            user.setZipCode(aes256Util.aesEncode(user.getZipCode()));
+            userRepository.save(user);
+        }
+        result.put("address", aes256Util.aesDecode(user.getAddress()));
+        result.put("addressDetail", aes256Util.aesDecode(user.getAddressDetail()));
+        result.put("zipCode", aes256Util.aesDecode(user.getZipCode()));
+
         if(unreadPushCount > 0 ){
             result.put("unreadPushCount", true);
         }else{
@@ -831,6 +854,25 @@ public class UserService {
         user.setPushType(pushType);
         userRepository.save(user);
     }
+
+    @Transactional
+    public void updateUserInfoEncode(Integer userId) throws NoSuchPaddingException, InvalidAlgorithmParameterException, UnsupportedEncodingException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+        User user = userRepository.findById(userId).get();
+        AES256Util aes256Util = new AES256Util();
+        try{
+            aes256Util.aesDecode(user.getAddress());
+
+        }catch (IllegalBlockSizeException e){
+            user.setAddress(aes256Util.aesEncode(user.getAddress()));
+            user.setAddressDetail(aes256Util.aesEncode(user.getAddressDetail()));
+            user.setBirthDay(aes256Util.aesEncode(user.getBirthDay()));
+            user.setZipCode(aes256Util.aesEncode(user.getZipCode()));
+            userRepository.save(user);
+        }
+
+    }
+
+
 
 
 

@@ -40,6 +40,11 @@ public class PushInfo {
     @ApiModelProperty(value = "읽음 여부", required = true)
     private String readYn;
 
+    //공지사항 여부
+    @Column
+    @ApiModelProperty(value = "공지사항", required = true)
+    private String noticeYn;
+
     //등록일
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
     @Column

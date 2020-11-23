@@ -60,6 +60,7 @@ public class PushInfoService {
                 pushInfo.setTitle(title);
                 pushInfo.setUser(user);
                 pushInfo.setReadYn("N");
+                pushInfo.setNoticeYn("N");
                 pushInfo.setCreateDatetime(new Date());
                 pushInfoRepository.save(pushInfo);
 
@@ -116,6 +117,7 @@ public class PushInfoService {
                     pushInfo.setTitle(title);
                     pushInfo.setUser(user.get(i));
                     pushInfo.setReadYn("N");
+                    pushInfo.setNoticeYn("Y");
                     pushInfo.setCreateDatetime(new Date());
                     pushInfoRepository.save(pushInfo);
                 }
