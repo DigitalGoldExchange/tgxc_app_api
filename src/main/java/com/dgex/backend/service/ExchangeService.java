@@ -584,7 +584,7 @@ public class ExchangeService {
         sb.append(title).append(System.getProperty("line.separator"))
                 .append("신청번호 : ").append(exchange.getReqNumber())
                 .append(System.getProperty("line.separator"))
-                .append("신청수량 : ").append(exchange.getAmount()+"TG")
+                .append("신청수량 : ").append(exchange.getAmount()+" TG")
                 .append(System.getProperty("line.separator"))
                 .append("신청일 : ").append(format.format(exchange.getCreateDatetime()))
                 .append(System.getProperty("line.separator"))
