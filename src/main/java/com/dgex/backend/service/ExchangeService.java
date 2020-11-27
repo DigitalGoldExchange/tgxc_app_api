@@ -4,10 +4,16 @@ import com.dgex.backend.config.JwtTokenProvider;
 import com.dgex.backend.entity.*;
 import com.dgex.backend.repository.*;
 import com.dgex.backend.service.common.FileManageService;
+import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.Message;
+import com.pengrad.telegrambot.model.request.ParseMode;
+import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.response.SendResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -389,7 +395,10 @@ public class ExchangeService {
         exchange.setAmount(sendTg);
         exchange.setStatus("신청");
         exchange.setUser(user);
-        exchangeRepository.save(exchange);
+        Exchange newEx = exchangeRepository.save(exchange);
+
+        sendTelegram("W", newEx);
+
     }
 
     @Transactional
@@ -444,6 +453,9 @@ public class ExchangeService {
             userExchangeImage.setExchange(newEx);
             userExchangeImageRepository.save(userExchangeImage);
         }
+
+        sendTelegram("E", newEx);
+
     }
 
     @Transactional
@@ -554,5 +566,71 @@ public class ExchangeService {
 
 
         return result;
+    }
+
+
+    public void sendTelegram(String type, Exchange exchange){
+
+        String title = null;
+        if(type.equals("E")){
+            title = "[TGXC 교환 신청]";
+        }else{
+            title = "[TGXC 출금 신청]";
+        }
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy년 MM월 dd일");
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(title).append(System.getProperty("line.separator"))
+                .append("신청번호 : ").append(exchange.getReqNumber())
+                .append(System.getProperty("line.separator"))
+                .append("신청수량 : ").append(exchange.getAmount()+"TG")
+                .append(System.getProperty("line.separator"))
+                .append("신청일 : ").append(format.format(exchange.getCreateDatetime()))
+                .append(System.getProperty("line.separator"))
+                .append("<a href='https://service.tgxc.net'><b>관리자 바로가기</b></a>")
+        ;
+
+
+        TelegramBot bot = new TelegramBot("1450724655:AAG5z8zd4n4Eyury8dZWavnryVaEK-5NuH0");
+        SendMessage request = new SendMessage(-478799146,sb.toString())
+                .parseMode(ParseMode.HTML)
+                .disableWebPagePreview(true)
+                .disableNotification(false);
+
+        SendResponse sendResponse = bot.execute(request);
+        boolean ok = sendResponse.isOk();
+        Message message = sendResponse.message();
+
+
+    }
+
+    @Transactional
+    public void sendTelegram1(){
+
+        String title = "[TGXC 교환 신청]";
+
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(title).append(System.getProperty("line.separator"))
+                .append("신청번호 : ").append("TGXC테스트입니다.")
+                .append(System.getProperty("line.separator"))
+                .append("신청수량 : ").append("12TG")
+                .append(System.getProperty("line.separator"))
+                .append("신청일 : ").append("2020/11.27")
+                .append(System.getProperty("line.separator"))
+                .append("<a href='https://service.tgxc.net'><b>관리자 바로가기</b></a>")
+        ;
+
+        TelegramBot bot = new TelegramBot("1450724655:AAG5z8zd4n4Eyury8dZWavnryVaEK-5NuH0");
+        SendMessage request = new SendMessage(-478799146,sb.toString())
+                .parseMode(ParseMode.HTML)
+                .disableWebPagePreview(true)
+                .disableNotification(false);
+
+        SendResponse sendResponse = bot.execute(request);
+        boolean ok = sendResponse.isOk();
+        Message message = sendResponse.message();
+
     }
 }

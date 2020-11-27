@@ -161,4 +161,11 @@ public class ExchangeController {
         exchangeService.insertExchange(userId, walletAddr,exchangeMethod, reqAmount, identifyCard, profileImage, exchangeStoreId, reqType, reqQty);
         return responseService.getSuccessResult();
     }
+
+    @ApiOperation(value = "텔레그램 테스트")
+    @PostMapping(value = "/sendTelegram")
+    public CommonResult sendTelegram1(){
+        exchangeService.sendTelegram1();
+        return responseService.getSuccessResult();
+    }
 }
