@@ -1,0 +1,49 @@
+server:
+  port: 8093
+
+spring:
+  profiles:
+  active: prod
+  datasource:
+    url: jdbc:mysql://localhost:3306/tgxc?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false
+    driver-class-name: com.mysql.jdbc.Driver
+    username: 'tgxc'
+    password: 'tgxc1234qwer!'
+    initialization-mode: always
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5Dialect
+    showSql: true
+    generate-ddl: true
+    database: mysql
+    properties.hibernate.format_sql: true
+    hibernate:
+      ddl-auto: update
+  banner:
+    location: ../banner.txt
+
+  logging:
+    config: classpath:logback.xml
+
+  jwt:
+    secret: govlepel@$&amp;
+
+
+  mail:
+    host: smtp.gmail.com
+    port: 465
+    username: support@tgxc.net
+    password: 'asdfqwer1234!@'
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          start-tls-enable: true
+          auth: true
+          ssl:
+            enable: true
+        transport:
+          protocol: smtps
+    default-encoding: UTF-8
+
+upload:
+  url: https://api.tgxc.net

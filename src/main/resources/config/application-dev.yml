@@ -1,0 +1,49 @@
+server:
+  port: 8093
+
+spring:
+  profiles:
+  active: dev
+  datasource:
+    url: jdbc:mysql://117.52.98.39:3306/dgex?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false
+    driver-class-name: com.mysql.jdbc.Driver
+    username: 'dgex'
+    password: 'dgex1234qwer!'
+    initialization-mode: always
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5Dialect
+    showSql: true
+    generate-ddl: true
+    database: mysql
+    properties.hibernate.format_sql: true
+    hibernate:
+      ddl-auto: update
+  banner:
+    location: ../banner.txt
+
+  logging:
+    config: classpath:logback.xml
+
+  jwt:
+    secret: govlepel@$&amp;
+
+
+  mail:
+    host: smtp.gmail.com
+    port: 465
+    username: support@tgxc.net
+    password: 'asdfqwer1234!@'
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          start-tls-enable: true
+          auth: true
+          ssl:
+            enable: true
+        transport:
+          protocol: smtps
+    default-encoding: UTF-8
+
+upload:
+  url: http://localhost:8093
